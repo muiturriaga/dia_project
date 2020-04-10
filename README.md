@@ -29,7 +29,15 @@ The matching application needs to learn both some information on the social netw
 #### Little introduction to github
 Very basic introduction of github in command line.
 
-Important you have to open the command line in the directory inside the repo's folder.
+#####Cloning the repository
+First of all you have to clone the folder in your computer
+	
+	#use the following line of code in the shell where you want to leave the repo in your computer
+	git clone https://github.com/muiturriaga/dia_project.git
+	
+
+
+Important, after cloning the repository, you have to open the command line (shell) in the directory inside the repo's folder.
 
 	#for example
 	~/dia_project $ 
