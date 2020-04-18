@@ -1,56 +1,42 @@
-from enum import Enum
 from typing import Dict, Any
-
 import numpy as np
 
 
-class Gender(Enum):
-    f = 0
-    m = 1
-    other = 2
-
-
-class Age(Enum):
-    young = 0
-    old = 1
-    teenage = 2
-
-
-class Location(Enum):
-    asia = 0
-    europe = 1
-    africa = 2
-    america = 3
-
-
-
-class Interests(Enum):
-    makeup = 0
-    sports = 1
-    politics = 2
-    science = 3
-    education = 4
-    sales_and_marketing = 5
-    other = 6
-
-    def describe(self):
-        # self is the member here
-        return self.name, self.value
-
-
-class SpecialFeatures(Enum):
-    A = 0
-    B = 1
-    C = 2
-
+# Considering these are our models
+#
+#
+# Gender:
+#       Female, Male, Other
+#       We represent this with an array with 3 elements [female, male, other]
+#
+# Age:
+#       Teenage, Young, Old
+#       We represent this with an array with 3 elements [Teenage, Young, Old]
+#
+# Interests:
+#        Makeup, Science, Sport, Books, Politics, Technology
+#        We represent this with an array with 6 elements [Makeup, Science, Sport, Books, Politics, Technology]
+#
+# Location:
+#        Europe, Asia, North_America, Africa, South_America, Antarctica, Australia
+#        We represent this with an array with 7 elements
+#        [Europe, Asia, North_America, Africa, South_America, Antarctica, Australia]
+#
+# Special_feature_f*
+#        A, B, C
+#
+#
+# Element 0 means that the attribute does not belong to that feature, while 1 indicates the selected
+# features for the Node.
+# For example if the vector of gender is like this [1, 0, 0], it means that Node is a male and the
+# attributes female and other doesn't belong to that node
 
 class Features:
-    def __init__(self, gender: Gender, age, interests: [Interests], location: Location,
-                 special_feature: SpecialFeatures):
+    def __init__(self, gender, age, interests, location,
+                 special_feature):
         self.gender = gender
         self.age = age
         self.interests = interests
-        self.flattened_interests = self.flatten_interests()
         self.location = location
         self.special_feature = special_feature
 
@@ -61,9 +47,3 @@ class Features:
                 "location": self.location,
                 "special_feature": self.special_feature
                 }
-
-    def flatten_interests(self):
-        interests_dict: Dict[str, int] = {}
-        for element in self.interests:
-            interests_dict[element.name] = element.value
-        return interests_dict
