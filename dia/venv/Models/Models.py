@@ -32,18 +32,15 @@ import numpy as np
 # attributes female and other doesn't belong to that node
 
 class Features:
-    def __init__(self, gender, age, interests, location,
-                 special_feature):
+    def __init__(self, gender, age, interests, location):
         self.gender = gender
         self.age = age
         self.interests = interests
         self.location = location
-        self.special_feature = special_feature
 
     def features_dictionary(self):
         return {"gender": self.gender,
                 "age": self.age,
                 "interests": self.interests,
-                "location": self.location,
-                "special_feature": self.special_feature
+                "location": self.location
                 }
