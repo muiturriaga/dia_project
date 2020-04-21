@@ -1,12 +1,11 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import os
-os.chdir(r'/home/loick/Documents/Python/Data Application/dia_project-Tara/dia/venv')
 import numpy as np
 from Models.Graph import *
 from networkx.algorithms import bipartite
 import random
-import networkx as nx
+
 
 ## Project
 # Nodes
@@ -39,6 +38,17 @@ for node in list_Nodes:
         G_project.add_node(node.num, bipartite = 0)
 
 
+# Add other nodes D.
+
+if len(set_right_nodes) < len(set_left_nodes):
+    n_diff = abs(len(set_right_num) - len(set_left_num))
+    for i in range(1,n_diff+1):
+        set_right_num.append(i + N_nodes)
+        set_right_nodes.append(Nodes( special_feature = 'D', num = (i + N_nodes)))
+        color_map.append('g')
+        G_project.add_node((i+N_nodes), bipartite = 1)
+
+
 list_Edges = []
 set_edges = []
 set_nodes = set_right_nodes + set_left_nodes
@@ -46,7 +56,7 @@ set_nodes_num = [i.num for i in set_nodes]
 for node1 in set_nodes:
     for node2 in set_nodes:
         # Here is the point, what is the adequate probability for matching ?
-        if (np.random.random() < 0.6 and node1.num != node2.num) :
+        if np.random.random() < 0.6 and node1.num != node2.num:
             list_Edges.append(Edges(node1, node2))
             set_edges.append((node1.num, node2.num))
 
@@ -64,9 +74,8 @@ print("number of C nodes ", len(set_right_num))
 #     print(i.special_feature)
 
 ## Question 2.
-# 1. Create a subgraph independent of the message.
+# 1. Create a sub-graph independent of the message.
 
-import random
 
 def active_edges(Graph, List_of_Edges_Graph, active_print : bool):
 
@@ -79,7 +88,7 @@ def active_edges(Graph, List_of_Edges_Graph, active_print : bool):
     list_active_edges_num = []
     list_active_edges = []
 
-    if active_print == True:
+    if active_print:
         print('List of seeds ', list_seeds)
         print('List of active nodes ', list_new_active)
 
@@ -89,7 +98,7 @@ def active_edges(Graph, List_of_Edges_Graph, active_print : bool):
         for edge in List_of_Edges_Graph :
             # If the edge connects one active and one non active node.
 
-            if ( edge.head.num in list_new_active and edge.tail.num not in list_active ):
+            if edge.head.num in list_new_active and edge.tail.num not in list_active:
                 p = round(edge.measure_similarity_distance(),5)
                 # Activate or not the edge depending of his probability of activation.
                 if np.random.binomial(1,p) == 1:
@@ -101,7 +110,7 @@ def active_edges(Graph, List_of_Edges_Graph, active_print : bool):
         list_new_active = list(set(list_add_edge))
         list_active+=list_new_active
 
-        if active_print == True:
+        if active_print:
             print('Now the current list is ', list_new_active, '\n')
 
     return list_active_edges_num, list_active_edges
@@ -125,7 +134,7 @@ def filter_node_by_message(List_activated_edges, message):
     list_activated_matching_num = [[], [], []]
     for edge in List_activated_edges:
         # Check if the head have the same special feature than the tail. In that case, save the tail and the head for the matching.
-        if (edge.head.special_feature == edge.tail.special_feature and message == edge.tail.special_feature ):
+        if edge.head.special_feature == edge.tail.special_feature and message == edge.tail.special_feature:
             # print(ord(edge.tail.special_feature[0])-65)
             num = (ord(edge.tail.special_feature[0])-65)
             list_activated_matching_num[num].append(edge.tail.num)
@@ -183,3 +192,21 @@ pos.update((node, (1, index)) for index, node in enumerate(Y))
 
 nx.draw(G_matching, pos=pos,  node_color = color_map_matching)
 plt.show()
+
+# 2. Design the matching application.
+def get_node_special_feature(num_node, list_node):
+    for a_node in list_node:
+        if a_node.num == num_node:
+            return a_node.special_feature
+
+def matching_application_message(list_nodes, list_activated, message):
+    list_nodes_in_matching = []
+    for edge in list_activated:
+        spec_f_node1 = get_node_special_feature(edge.head, list_nodes)
+        spec_f_node2 = get_node_special_feature(edge.tail, list_nodes)
+        print(spec_f_node1, spec_f_node2)
+        # Check the special feature of the nodes.
+        if spec_f_node1 == spec_f_node2:
+
+            list_nodes_in_matching.append(edge.head, edge.tail)
+    return list_nodes_in_matching
