@@ -125,7 +125,7 @@ def filter_node_by_message(List_activated_edges, message):
     list_activated_matching_num = [[], [], []]
     for edge in List_activated_edges:
         # Check if the head have the same special feature than the tail. In that case, save the tail and the head for the matching.
-        if (edge.head.special_feature[0] == edge.tail.special_feature[0] and message == edge.tail.special_feature[0] ):
+        if (edge.head.special_feature == edge.tail.special_feature and message == edge.tail.special_feature ):
             # print(ord(edge.tail.special_feature[0])-65)
             num = (ord(edge.tail.special_feature[0])-65)
             list_activated_matching_num[num].append(edge.tail.num)
