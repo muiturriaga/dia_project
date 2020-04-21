@@ -1,4 +1,4 @@
-# import networkx as nx
+import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 from Models.Graph import *
@@ -8,7 +8,7 @@ import random
 
 ## Project
 # Nodes
-
+G_project = nx.Graph()
 N_nodes = 25
 color_map = [''] * N_nodes
 
@@ -24,7 +24,7 @@ set_right_nodes = []
 set_left_num = []
 set_left_nodes = []
 for node in list_Nodes:
-    if node.features["special_feature"] == 3:
+    if node.special_feature == 'C':
         set_right_num.append(node.num)
         set_right_nodes.append(node)
         color_map[node.num] = 'b'
@@ -95,18 +95,18 @@ def active_edges(Graph, List_of_Edges_Graph, active_print):
         # Activation probability
         for edge in List_of_Edges_Graph :
             # If the edge connects one active and one non active node.
-            if ( tuple(edge.nodes)[0] in list_new_active and tuple(edge.nodes)[1] not in list_active ) or ( tuple(edge.nodes)[1] in list_new_active and tuple(edge.nodes)[0] not in list_active ):
+            if ( edge.head in list_new_active and edge.tail not in list_active ) or ( edge.tail in list_new_active and edge.head not in list_active ):
 
                 p = round(edge.proba_activation[0],5)
                 # Activate or not the edge depending of his probability of activation.
                 if np.random.binomial(1,p) == 1:
                     # What is the node not activated ?
-                    if edge.nodes[0] not in list_new_active :
-                        list_add_edge.append(edge.nodes[0])
+                    if edge.head not in list_new_active :
+                        list_add_edge.append(edge.head)
                     else :
-                        list_add_edge.append(edge.nodes[1])
+                        list_add_edge.append(edge.tail)
                         list_active_edges.append(edge)
-                    list_active_edges_num.append(edge.nodes)
+                    list_active_edges_num.append([edge.head, edge.tail])
 
         list_new_active = list(set(list_add_edge))
         list_active+=list_new_active
@@ -137,11 +137,11 @@ def get_node_special_feature(num_node, list_node):
 def matching_application_message(list_nodes, list_activated, message):
     list_nodes_in_matching = []
     for edge in list_activated:
-        spec_f_node1 = get_node_special_feature(edge.nodes[0], list_nodes)
-        spec_f_node2 = get_node_special_feature(edge.nodes[1], list_nodes)
+        spec_f_node1 = get_node_special_feature(edge.head, list_nodes)
+        spec_f_node2 = get_node_special_feature(edge.tail, list_nodes)
         print(spec_f_node1, spec_f_node2)
         # Check the special feature of the nodes.
         if spec_f_node1 == spec_f_node2:
 
-            list_nodes_in_matching.append(edge.nodes[0], edge.nodes[1])
+            list_nodes_in_matching.append(edge.head, edge.tail)
     return list_nodes_in_matching

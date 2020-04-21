@@ -45,6 +45,8 @@ class Edges:
         self.feature_distance = self.calculate_features_distance()
         self.similarity_distance = self.measure_similarity_distance()
         self.theta = np.random.dirichlet(np.ones(len(self.feature_distance)), size=1)
+        # I don't know what to write here
+        self.proba_activation = 0
 
     def calculate_features_distance(self):
         features_distance = {}
