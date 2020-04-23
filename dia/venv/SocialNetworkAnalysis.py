@@ -11,7 +11,7 @@ import random
 # Nodes
 G_project = nx.Graph()
 
-N_nodes = 100
+N_nodes = 50
 color_map = [''] * N_nodes
 
 # Initialisation of nodes.
@@ -38,24 +38,13 @@ for node in list_Nodes:
         G_project.add_node(node.num, bipartite = 0)
 
 
-# Add other nodes D.
-
-if len(set_right_nodes) < len(set_left_nodes):
-    n_diff = abs(len(set_right_num) - len(set_left_num))
-    for i in range(1,n_diff+1):
-        set_right_num.append(i + N_nodes)
-        set_right_nodes.append(Nodes( special_feature = 'D', num = (i + N_nodes)))
-        color_map.append('g')
-        G_project.add_node((i+N_nodes), bipartite = 1)
-
-
 list_Edges = []
 set_edges = []
 set_nodes = set_right_nodes + set_left_nodes
 set_nodes_num = [i.num for i in set_nodes]
 for node1 in set_nodes:
     for node2 in set_nodes:
-        # Here is the point, what is the adequate probability for matching ?
+        # Here is the point, what is the adequate probability for add edges ?
         if np.random.random() < 0.6 and node1.num != node2.num:
             list_Edges.append(Edges(node1, node2))
             set_edges.append((node1.num, node2.num))
@@ -192,21 +181,3 @@ pos.update((node, (1, index)) for index, node in enumerate(Y))
 
 nx.draw(G_matching, pos=pos,  node_color = color_map_matching)
 plt.show()
-
-# 2. Design the matching application.
-def get_node_special_feature(num_node, list_node):
-    for a_node in list_node:
-        if a_node.num == num_node:
-            return a_node.special_feature
-
-def matching_application_message(list_nodes, list_activated, message):
-    list_nodes_in_matching = []
-    for edge in list_activated:
-        spec_f_node1 = get_node_special_feature(edge.head, list_nodes)
-        spec_f_node2 = get_node_special_feature(edge.tail, list_nodes)
-        print(spec_f_node1, spec_f_node2)
-        # Check the special feature of the nodes.
-        if spec_f_node1 == spec_f_node2:
-
-            list_nodes_in_matching.append(edge.head, edge.tail)
-    return list_nodes_in_matching
