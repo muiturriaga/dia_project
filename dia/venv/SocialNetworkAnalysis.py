@@ -1,17 +1,19 @@
+import os
+os.chdir("C:/Users/Loick/Documents/Ecole Nationale des Ponts et Chaussées/2A/Erasmus Milan/Data Analysis/dia_project-master/dia_project-master/dia/venv")
+set()
 import networkx as nx
 import matplotlib.pyplot as plt
-import os
 import numpy as np
+import random
 from Models.Graph import *
 from networkx.algorithms import bipartite
-import random
 
 
 ## Project
 # Nodes
-G_project = nx.Graph()
 
-N_nodes = 50
+N_nodes = 25
+G_project = nx.Graph()
 color_map = [''] * N_nodes
 
 # Initialisation of nodes.
@@ -45,7 +47,7 @@ set_nodes_num = [i.num for i in set_nodes]
 for node1 in set_nodes:
     for node2 in set_nodes:
         # Here is the point, what is the adequate probability for add edges ?
-        if np.random.random() < 0.6 and node1.num != node2.num:
+        if np.random.random() < 0.1 and node1.num != node2.num:
             list_Edges.append(Edges(node1, node2))
             set_edges.append((node1.num, node2.num))
 
@@ -57,7 +59,6 @@ plt.show()
 
 print("number of A or B nodes ", len(set_left_num))
 print("number of C nodes ", len(set_right_num))
-
 
 # for i in set_nodes:
 #     print(i.special_feature)
