@@ -2,7 +2,7 @@
 Data Intelligence Application project, based on social networks and matching applications
 
 ## Goal
-The goal is modeling a scenario in which a matching application exploits social influence to attract more and more users. 
+The goal is modeling a scenario in which a matching application exploits social influence to attract more and more users.
 ## About the project
 The matching application needs to learn both some information on the social networks and the probabilities that the pairs of nodes will actually match after the matching has been suggested to them.
 
@@ -18,7 +18,7 @@ The matching application needs to learn both some information on the social netw
 
 3. Apply a combinatorial bandit algorithm to the situation in which the activation probabilities are not known and we can observe the activation of the edges. Here, the goal is to maximize the social influence for message A. Plot the cumulative regret as time increases.
 
-4. Design a bipartite matching algorithm in which the nodes taking part into the matching are the nodes activated in the social network by message a single message, and apply to message A. Assume that the activation probabilities are known and apply a combinatorial bandit algorithm to learn the probabilities related to the matches. Plot the cumulative regret as time increases. 
+4. Design a bipartite matching algorithm in which the nodes taking part into the matching are the nodes activated in the social network by message a single message, and apply to message A. Assume that the activation probabilities are known and apply a combinatorial bandit algorithm to learn the probabilities related to the matches. Plot the cumulative regret as time increases.
 
 5. You are given a cumulative budget for three messages A, B, and C. Design an algorithm allocating the best budget to the three messages to maximize the value of the matching when all the information is known. Suggestion: assume that the budget allocated to the three messages is discretized and the discretization is coarse ( m is the number of different values). The best allocation can be found by enumerating all the possible combinations of allocation of budget to the three messages. The algorithm has a complexity that is O( m ^2). Use this algorithm in the following.
 
@@ -29,18 +29,18 @@ The matching application needs to learn both some information on the social netw
 #### Little introduction to github
 Very basic introduction of github in command line.
 
-#####Cloning the repository
+##### Cloning the repository
 First of all you have to clone the folder in your computer
-	
+
 	#use the following line of code in the shell where you want to leave the repo in your computer
 	git clone https://github.com/muiturriaga/dia_project.git
-	
+
 
 
 Important, after cloning the repository, you have to open the command line (shell) in the directory inside the repo's folder.
 
 	#for example
-	~/dia_project $ 
+	~/dia_project $
 
 
 ##### Updating our folder:
@@ -73,6 +73,3 @@ Using this helper will store your passwords unencrypted on disk, protected only 
 	#[several days later]
 	git push
 	#[your credentials are used automatically]
-
-
-
