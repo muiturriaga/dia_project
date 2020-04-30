@@ -3,6 +3,7 @@ import math
 import random
 import json
 import time
+from queue import Queue
 from typing import Dict, Any
 
 # Considering these are our models
@@ -63,6 +64,10 @@ class Feature:
 class Node:
     def __init__(self, num, special_feature=None, old_features_dict = None):
         self.id = num
+        self.activated = False # useful for spreading messages
+        self.has_share = False # useful for spreading messages
+        self.total_neighbor_activated_cascade = 0
+        self.activated_by_same_type = False
         self.special_feature = special_feature if special_feature is not None else np.random.choice(
             ['A', 'B', 'C'], 1, p=[0.28, 0.28, 0.44])[0] #[0] to have the feature equal to a str "A", not =["A"] ##faster and lighter
         if old_features_dict == None:
@@ -92,10 +97,10 @@ class Node:
 class Edge:
     def __init__(self, Node_1: Node, Node_2: Node, old = False):
         # It's not a good idea to save again the entire node as head or tail.
-        self.head: Node = Node_1
-        self.tail: Node = Node_2
+        self.head = Node_1.id
+        self.tail = Node_2.id
         if old == False:
-            self.feature_distance = self.calculate_features_distance()
+            self.feature_distance = self.calculate_features_distance(Node_1, Node_2)
             self.similarity_distance = self.measure_similarity_distance()
             self.theta = np.random.dirichlet(np.ones(len(self.feature_distance)), size=1).tolist() #tolist() to avoid numpy.ndarray
             # I don't know what to write here
@@ -107,10 +112,10 @@ class Edge:
             self.proba_activation = old.get('proba_activation')
 
 
-    def calculate_features_distance(self):
+    def calculate_features_distance(self, node1, node2):
         features_distance = {}
-        head = self.head.features
-        tail = self.tail.features
+        head = node1.features
+        tail = node2.features
         # Map to convert into float type, instead of using int32 of numpy
         # Actually it can be also int instead of float, Tara please confirm it.
         for feature in head:
@@ -133,57 +138,68 @@ class Graph:
         self.probConnection = probConnection
         self.list_nodes = []
         self.list_edges = []
-        if old == False:
+        if old == False: #create a new graph
             self.adjacent_matrix = [[] for i in range(self.numberNodes)]
             self.create_nodes()
             self.connect_graph()
         else: #load existent graph
             self.load_from_json(old)
 
+    ## Create all the random nodes needed
     def create_nodes(self):
         for i in range(self.numberNodes):
             self.list_nodes.append(Node(i))
 
-    #Generate a condenced adjacent matrix.
-    #self.adjacent_matrix[XX] will be a list of all the EDGES connected to XX
+    ## Generate a condenced adjacent matrix.
+    ## This matrix is kinda matrix[node_id] = list_of_edges_ids
+    ## self.adjacent_matrix[XX] will be a list of all the EDGES connected to XX
     def connect_graph(self):
         k = 0
         for i in range(self.numberNodes):
             for j in range(i + 1, self.numberNodes): ## i + 1 to not have repeated edges as we have undirected socialnetwork (half-time computing)
                 if random.random() <= self.probConnection:
                     self.list_edges.append(Edge(self.list_nodes[i], self.list_nodes[j]))
-                    self.adjacent_matrix[i].append(k) ## will be used as a pointer
+                    self.adjacent_matrix[i].append(k) # will be used as a pointer
                     self.adjacent_matrix[j].append(k)
                     k += 1
 
+    ## Function transforming the Graph class into a JSON serializable
     def turn_self_dict(self):
         for i in range(self.numberNodes):
             self.list_nodes[i] = self.list_nodes[i].__dict__
         self.list_nodes = {i : self.list_nodes[i] for i in range(len(self.list_nodes))}
         for i in range(len(self.list_edges)):
-            self.list_edges[i].head = self.list_edges[i].head.__dict__
-            self.list_edges[i].tail = self.list_edges[i].tail.__dict__
+            # self.list_edges[i].head = self.list_edges[i].head.__dict__
+            # self.list_edges[i].tail = self.list_edges[i].tail.__dict__
             self.list_edges[i] = self.list_edges[i].__dict__
         self.list_edges = {i : self.list_edges[i] for i in range(len(self.list_edges))}
         self.adjacent_matrix = {i: self.adjacent_matrix[i] for i in range(len(self.adjacent_matrix))}
         return self.__dict__
 
+    ## Function used to generate a graph from JSON file
     def load_from_json(self, jsonfile):
         # recovering list of nodes from json
         for item in jsonfile.get('list_nodes').items():
-            self.list_nodes = Node(item[1].get('id'), item[1].get('special_feature'), item[1].get('features'))
+            self.list_nodes.append(Node(item[1].get('id'), item[1].get('special_feature'), item[1].get('features')))
         # recovering adjacent matrix from json
         self.adjacent_matrix = []
         for item in jsonfile.get('adjacent_matrix').items():
             self.adjacent_matrix.append(item[1])
         # recovering list of edges from json
         for k, v in jsonfile.get('list_edges').items():
-            head = v.get('head')
-            node_head = Node(head.get('id'), head.get('special_feature'), head.get('features'))
-            tail = v.get('tail')
-            node_tail = Node(tail.get('id'), tail.get('special_feature'), tail.get('features'))
-            self.list_edges.append(Edge(node_head, node_tail, v))
+            node_head_id = v['head']
+            node_tail_id = v['tail']
+            self.list_edges.append(Edge(self.list_nodes[node_head_id], self.list_nodes[node_tail_id], v))
 
+
+
+    ## Function returning a list of all the nodes of the type desired
+    def return_nodes_of_type(self, typeDesired):
+        retList = []
+        for node in self.list_nodes:
+            if node.special_feature == typeDesired:
+                retList.append(node)
+        return retList
 
 
 ## Just a caller function
@@ -196,7 +212,7 @@ def load_social_network(jsonfile):
 def import_social_network(numberNodes, probConnection):
     SN = None
     try:
-        file = open("functions/graphs_files/graph_nodes{}_probconnection{}.txt".format(numberNodes, probConnection))
+        file = open("app/functions/graphs_files/graph_nodes{}_probconnection{}.txt".format(numberNodes, probConnection))
         data = json.load(file)
         SN = load_social_network(data)
         file.close()
@@ -204,9 +220,79 @@ def import_social_network(numberNodes, probConnection):
 
     except:
         print("Creating social network,\n\nNumber of nodes: {}\nProability of having an edge between two nodes: {}\nThis may take a while ...".format(numberNodes, probConnection))
-        with open("functions/graphs_files/graph_nodes{}_probconnection{}.txt".format(numberNodes, probConnection), 'w') as outfile:
+        with open("app/functions/graphs_files/graph_nodes{}_probconnection{}.txt".format(numberNodes, probConnection), 'w') as outfile:
             SN = Graph(numberNodes, probConnection)
             json.dump(SN.turn_self_dict(), outfile)
+
     finally:
-        print("\nReturning Social Network | classtype: {}".format(type(SN)))
+        if type(SN) != Graph:
+            print("Error in social returning classtype: {}\n\n".format(type(SN)))
+        else:
+            print("\nReturning Social Network | classtype: {}\n\n".format(type(SN)))
         return SN
+
+## Function to spread a message over the network
+## This function require the SN graph, the type of Message (A,B or C)
+## and also a list of initial nodes for spreading
+## also implemented multipletimeinfluenced=False, which means:
+## if a node is no activated at the first attempt this node will be blocked,
+## and in the future no other node will be able to activate it, but if we set it
+## ==True, every attempt of activation will be completely valid.
+## multipletimeinfluenced == False => one attempt to be activated
+## multipletimeinfluenced == True  => multiple attempts to activate the node
+## multipletimesharing == False => a node can spread the message one time
+## multipletimesharing == True  => a node can spread the message multiple times
+## so we'll have 4 possible cases for the 2 booleans vars
+def spread_message_SN(SN : Graph, typeMessage, list_seeds_nodes, multipletimeinfluenced = False, multipletimesharing = False):
+    queue = Queue()
+    activated_nodes = []
+    total_messages = 0
+    # activating seeds
+    for node_id in list_seeds_nodes:
+        queue.put(node_id)
+        activated_nodes.append(node_id)
+        SN.list_nodes[node_id].activated = True
+    # spreading from the queue
+    while not queue.empty():
+        node_id = queue.get()
+        for edge_id in SN.adjacent_matrix[node_id]:
+            edge = SN.list_edges[edge_id]
+            from_id = node_id
+            to_id = edge.tail if (from_id == edge.head) else edge.head
+            toNode = SN.list_nodes[to_id]
+            ##FIRST CASE multi_influenced==False, multi_sharing==False.
+            if multipletimeinfluenced == False and multipletimesharing == False:
+                if toNode.activated == False: #send message if not already activated
+                    print("spreading from node: {} to node: {}".format(from_id, to_id))
+                    total_messages += 1
+                    if random.random() <= edge.proba_activation: #proving activate
+                        toNode.activated = True
+                        queue.put(toNode.id)
+                        activated_nodes.append(toNode.id)
+                    ##NOT FINISHED
+            ##SECOND CASE multi_influenced==False, multi_sharing==True.
+            elif multipletimeinfluenced == False and multipletimesharing == True:
+                None #Constructing
+            ##THIRD CASE multi_influenced==True, multi_sharing==False.
+            elif multipletimeinfluenced == True and multipletimesharing == False:
+                None #Constructing
+            ##FOURTH CASE multi_influenced==True, multi_sharing==True.
+            elif multipletimeinfluenced == True and multipletimesharing == True:
+                None #Constructing
+    print("\n\nSome metrics that may be useful: ")
+    print("Message spreaded of type: {}".format(typeMessage))
+    print("Total number of nodes: {}".format(len(SN.list_nodes)))
+    print("Total number of seeds: {}".format(len(list_seeds_nodes)))
+    print("Total number edges: {}".format(len(SN.list_edges)))
+    print("Total nodes activated including seeds: {}".format(len(activated_nodes)))
+    print("Total nodes activated without seeds: {}".format(len(activated_nodes)-len(list_seeds_nodes)))
+    print("Total messages sent: {}".format(total_messages))
+
+            ##constructing
+
+
+
+## YOU CAN TRY THE CODE HERE
+erase = '\x1b[1A\x1b[2K'
+SN = import_social_network(1000,0.1)
+#spread_message_SN(SN, "A", [1,3,4,5,6,7,8])
