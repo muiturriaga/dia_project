@@ -36,6 +36,7 @@ class Edges():
 class Matching:
     def __init__(self, list_of_nodes):
         self.list_of_nodes = list_of_nodes
+        self.list_of_edges = []
 
     def matching(self):
         G = nx.Graph()
@@ -71,7 +72,6 @@ class Matching:
         G.add_weighted_edges_from(set_edges)
 
         matched_nodes = nx.max_weight_matching(G, maxcardinality=False)
-        # matched_list should be with weight
         matched_list = []
         for pair_of_nodes in matched_nodes:
             for nodes in list_edges:
@@ -87,7 +87,9 @@ class Matching:
         pos.update((n, (2, i)) for i, n in enumerate(Y))  # put nodes from Y at x=2
         nx.draw(B, pos=pos, labels=None)
         plt.show()
-        weight = sum(matched_list.value)
+        weight = 0
+        for edges in matched_list:
+            weight += edges.weight
         return weight
 
     # function to set a counter for the matching
