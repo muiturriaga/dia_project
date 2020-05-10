@@ -3,19 +3,20 @@ import numpy as np
 from networkx.algorithms import bipartite
 import matplotlib.pyplot as plt
 from NodeSelection import NodeSelector
+from scipy.stats import bernoulli
 
 list_types = ['A', 'B', 'C', 'D']
 N_nodes = 160
 color_map = [''] * N_nodes
 
 
-class Nodes():
+class Nodes:
     def __init__(self, num, node_type):  # better to replace Special_f's argument postion with feeathre's postion
         self.num = num
         self.node_type = node_type
 
 
-class Edges():
+class Edges:
 
     def __init__(self, Node_1, Node_2, weight_prob):
         constant = 1
@@ -32,6 +33,7 @@ class Edges():
         # Features of the edge.
         self.weight = weight_prob * constant
         self.nodes = [Node_1.num, Node_2.num]
+
 
 class Matching:
     def __init__(self, list_of_nodes):
@@ -56,7 +58,7 @@ class Matching:
                 set_left_nodes.append(node)
                 color_map[node.num] = 'r'
                 G.add_node(node.num, bipartite=0)
-#list optimal
+        # list optimal
         list_edges = []
         set_edges = []
         for node_r in set_right_nodes:
@@ -64,10 +66,14 @@ class Matching:
                 # Here is the point, what is the adequate probability for matching ?
                 if np.random.random() <= 1:
                     # 20,000 trials, and count the number that generate zero positive results.(bernoulli distr)
-                    weight_prob = sum(np.random.binomial(9, 0.1, 200) == 0)/200.
+                    # weight_prob = sum(np.random.binomial(1, p, 20) == 0) / 20.
+                    #### Bernouli distr is Bionomial with n=1
+                    # if we want to give a random dist with many nodes : mu=vector of random mean returned ; weight= np.random.binomial(n=1, p=mu, size=len(mu))
+                    p = np.random.random()
+                    weight_prob=sum(np.random.binomial(1, p, 1) == 1)
                     list_edges.append(Edges(node_r, node_l, weight_prob))
                     set_edges.append((node_r.num, node_l.num, weight_prob))
-    #return weight_prob
+        # return weight_prob
         # set_edges
         G.add_weighted_edges_from(set_edges)
 
@@ -93,6 +99,8 @@ class Matching:
         return weight
 
     # function to set a counter for the matching
+
+
 list_nodes = []
 for i in range(160):
     # node_type=np.random.choice(list_types,1,p=[0.25,0.25,0.25,0.25])

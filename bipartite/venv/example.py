@@ -1,12 +1,12 @@
 import numpy as np
 from Learner import *
-
+from matching import *
 n_of_nodes = 160
-mu, sigma = 0, 0.1 # mean and standard deviation
+mu, sigma = 0, 0.1  # mean and standard deviation
 
 T = 300
 
-n_experiments = 100
+n_experiments = 1
 
 reward_per_experiment = []
 
