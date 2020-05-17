@@ -19,7 +19,7 @@ from typing import Dict, Any
 #
 # Interests:
 #        Makeup, Science, Sport, Books, Politics, Technology
-#        We represent this with an array with 6 elements [Makeup, Science, Sport, Books, Politics, Technology]
+#        We represent this with an array with 7 elements [Makeup, Science, Sport, Books, Politics, Technology]
 #
 # Location:
 #        Europe, Asia, North_America, Africa, South_America, Antarctica, Australia
@@ -96,31 +96,57 @@ class Node:
 
 class Edge:
     def __init__(self, Node_1: Node, Node_2: Node, old = False):
-        # It's not a good idea to save again the entire node as head or tail.
         self.head = Node_1.id
         self.tail = Node_2.id
         if old == False:
             self.feature_distance = self.calculate_features_distance(Node_1, Node_2)
+            self.features = self.get_features(Node_1, Node_2)
             self.similarity_distance = self.measure_similarity_distance()
-            self.theta = np.random.dirichlet(np.ones(len(self.feature_distance)), size=1).tolist() #tolist() to avoid numpy.ndarray
-            # I don't know what to write here
-            self.proba_activation = 0
-        else: #load existent Edge
+            self.theta = np.random.dirichlet(np.ones(len(self.feature_distance)), size=1).tolist()[0]
+
+            self.proba_activation = np.dot(self.theta, [ (1 - self.feature_distance['gender']), (1 -  self.feature_distance['age']), (1 - self.feature_distance['interests']), (1 - self.feature_distance['location']) ])
+            # If our feature_distance is [0,0,0,0] we want to have a probability of  to activate the edge. That is why there is "1-feature(edge)". Theta is a weight vector which change randomly the weight between the features.
+
+        else:
             self.feature_distance = old.get('feature_distance')
+            self.features = old.get('features')
             self.similarity_distance = float(old.get('similarity_distance'))
             self.theta = old.get('theta')
             self.proba_activation = old.get('proba_activation')
 
+        self.features_1 = Node_1.features
+        self.features_2 = Node_2.features
+
+    def get_features(self, node1, node2):
+        gender_1 = np.array([int(i) for i in node1.features['gender']])
+        gender_2 = np.array([int(i) for i in node2.features['gender']])
+        list_gender = list(gender_1 & gender_2)
+
+        age_1 = np.array([int(i) for i in node1.features['age']])
+        age_2 = np.array([int(i) for i in node2.features['age']])
+        list_age = list(age_1 & age_2)
+
+        interests_1 = np.array([int(i) for i in node1.features['interests']])
+        interests_2 = np.array([int(i) for i in node2.features['interests']])
+        list_interests = list(interests_1 & interests_2)
+
+        location_1 = np.array([int(i) for i in node1.features['location']])
+        location_2 = np.array([int(i) for i in node2.features['location']])
+        list_location = list(location_1 & location_2)
+
+        return (list_gender + list_interests + list_age + list_location)
 
     def calculate_features_distance(self, node1, node2):
         features_distance = {}
         head = node1.features
         tail = node2.features
-        # Map to convert into float type, instead of using int32 of numpy
-        # Actually it can be also int instead of float, Tara please confirm it.
         for feature in head:
-            features_distance[feature] = float(np.dot(head[feature], tail[feature]))
+            sum_diff = 0 # Compute the sum of the difference as it is written in the project.
+            for i in range(len(head[feature])):
+                sum_diff += abs(head[feature][i] - tail[feature][i])
+            features_distance[feature] = round(sum_diff/len(head[feature]),2)
         return features_distance
+        # [1,1,1,1] means we are really dissimilar while [0,0,0,0] implies the nodes have the same features.
 
     def measure_similarity_distance(self):
         fe = 0
@@ -293,6 +319,6 @@ def spread_message_SN(SN : Graph, typeMessage, list_seeds_nodes, multipletimeinf
 
 
 ## YOU CAN TRY THE CODE HERE
-erase = '\x1b[1A\x1b[2K'
-SN = import_social_network(1000,0.1)
-#spread_message_SN(SN, "A", [1,3,4,5,6,7,8])
+# erase = '\x1b[1A\x1b[2K'
+# SN = import_social_network(1000,0.1)
+# #spread_message_SN(SN, "A", [1,3,4,5,6,7,8])
