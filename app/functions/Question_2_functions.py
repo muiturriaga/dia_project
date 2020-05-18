@@ -2,41 +2,6 @@ from .Tools import *
 
 ## Question 2.
 
-def simulate_episode(init_prob_matrix, n_steps_max, budget, perfect_nodes):
-    prob_matrix = init_prob_matrix.copy()
-    n_nodes = prob_matrix.shape[0]
-
-    if len(perfect_nodes) == 0:
-        # We activates a number of nodes equal to the budget considering 1 node = 1 unit of budget.
-        initial_active_nodes = np.zeros(n_nodes)
-        for i in range(budget):
-            initial_active_nodes[i] = 1
-        random.shuffle(initial_active_nodes)
-        # print('Initial active nodes are : ' , initial_active_nodes.nonzero()[0], '\n')
-    else :
-        initial_active_nodes = np.zeros(n_nodes)
-        for i in perfect_nodes:
-            initial_active_nodes[i] = 1
-
-    history = np.array([initial_active_nodes])
-    active_nodes = initial_active_nodes
-    newly_active_nodes = active_nodes
-
-    t = 0
-    while(t < n_steps_max and np.sum(newly_active_nodes) > 0):
-        # Extract only rows where nodes are activated.
-        p = (prob_matrix.T * active_nodes).T
-        # Draw random numbers and catch if we can activate them or not. If M_ij is True it means node i activate node j.
-        activated_edges = p > np.random.rand(p.shape[0], p.shape[1])
-        # If edges were not activated, they disappear.
-        prob_matrix = prob_matrix * ((p != 0) == activated_edges)
-        # Return nodes where edges have been activated.
-        newly_active_nodes = (np.sum(activated_edges, axis=0) > 0) * (1-active_nodes)
-        active_nodes = np.array( active_nodes + newly_active_nodes)
-        history = np.concatenate((history, [newly_active_nodes]), axis=0)
-        t += 1
-    return history
-
 # Find episode with initial nodes in order to verify the results
 def find_episode(list_num_nodes, dataset):
     initial_nodes = [0]*len(dataset[0][0])
@@ -77,10 +42,4 @@ def estimate_node_message(dataset, message, list_nodes):
     return [list_credit, time_credit] # Return the number of nodes approximately activated at each episode.
 
 
-def check_attributes(list_num_nodes, list_nodes):
-    n = len(list_num_nodes)
-    attribute = []
-    for index in range(n):
-        attribute.append(list_nodes[list_num_nodes[index]].special_feature)
-    return attribute
 
