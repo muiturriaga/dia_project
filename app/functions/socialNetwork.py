@@ -102,7 +102,6 @@ class Edge:
         # old == True (or whatelse) means that we are loading the SN from a json file
         if old == False:
             self.feature_distance = self.calculate_features_distance(Node_1, Node_2)
-            self.features = self.get_features(Node_1, Node_2)
             self.similarity_distance = self.measure_similarity_distance()
             self.theta = np.random.dirichlet(np.ones(len(self.feature_distance)), size=1).tolist() #tolist() to avoid numpy.ndarray
             # probability of activation based on the similarity_distance
@@ -168,7 +167,6 @@ class Graph:
                     self.adjacent_matrix[j].append(k)
                     k += 1
 
-    ## DEPRECATED
     ## Function transforming the Graph class into a JSON serializable
     def turn_self_dict(self):
         for i in range(self.numberNodes):
@@ -301,5 +299,5 @@ def spread_message_SN(SN : Graph, typeMessage, list_seeds_nodes, multipletimeinf
 
 ## YOU CAN TRY THE CODE HERE
 # erase = '\x1b[1A\x1b[2K'
-# SN = import_social_network(1000,0.1)
+SN = import_social_network(1000,0.1)
 # #spread_message_SN(SN, "A", [1,3,4,5,6,7,8])
