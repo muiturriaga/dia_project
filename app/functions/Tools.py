@@ -46,10 +46,10 @@ def create_graph(message_left, message_right, N_nodes, treshold):
 
 def draw_graph(edges_info, nodes_info, color_map):
     G_project = nx.Graph()
-    for node in nodes_info[2]:
+    for node in nodes_info:
         G_project.add_node(node.id)
 
-    G_project.add_edges_from(edges_info[0])
+    G_project.add_edges_from(edges_info)
 
     nx.draw_networkx(G_project, labels=None, node_color=color_map)
     nx.spring_layout(G_project)

@@ -5,16 +5,16 @@
 # The activation probabilities are known.
 # The budget is constant over experiences.
 
-import os
-os.chdir("C:/Users/Loick/Documents/Ecole Nationale des Ponts et Chaussées/2A/Erasmus Milan/Data Analysis/dia_project-master")
+#import os
+#os.chdir("C:/Users/Loick/Documents/Ecole Nationale des Ponts et Chaussées/2A/Erasmus Milan/Data Analysis/dia_project-master")
 
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 import random
 
-from app.functions.socialNetwork import *
-from app.functions.Tools import *
+from functions.socialNetwork import *
+from functions.Tools import *
 from networkx.algorithms import bipartite
 
 
