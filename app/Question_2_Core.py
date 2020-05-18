@@ -14,7 +14,7 @@ import numpy as np
 import random
 
 from app.functions.socialNetwork import *
-from app.functions.Tools import *
+from app.functions.Question_2_functions import *
 from networkx.algorithms import bipartite
 
 
