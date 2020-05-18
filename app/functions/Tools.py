@@ -6,12 +6,12 @@ from networkx.algorithms import bipartite
 import random
 
 #Create bipartite graph
-def create_graph(message_left, message_right, N_nodes, treshold):
-    color_map = [''] * N_nodes
+def create_graph(message_left, message_right, n_nodes, threshold):
+    color_map = [''] * n_nodes
 
     # Initialisation of nodes.
     list_Nodes = []
-    for i in range(N_nodes):
+    for i in range(n_nodes):
         list_Nodes.append(Node(i))
 
     # Assignments of features.
@@ -35,7 +35,8 @@ def create_graph(message_left, message_right, N_nodes, treshold):
     set_nodes_num = [i.id for i in set_nodes]
     for node1 in set_nodes:
         for node2 in set_nodes:
-            if np.random.random() < treshold and node1.id != node2.id:
+            # Create an edge iif a number generated is inferior to our threshold.
+            if np.random.random() < threshold and node1.id != node2.id:
                 list_Edges.append(Edge(node1, node2))
                 set_edges.append((node1.id, node2.id))
 
@@ -55,59 +56,4 @@ def draw_graph(edges_info, nodes_info, color_map):
     nx.spring_layout(G_project)
     plt.show()
 
-# Question 2.
 
-
-def simulate_episode(init_prob_matrix, n_steps_max, budget):
-    prob_matrix = init_prob_matrix.copy()
-    n_nodes = prob_matrix.shape[0]
-
-    # We activates a number of nodes equal to the budget considering 1 node = 1 unit of budget.
-    initial_active_nodes = np.zeros(n_nodes)
-    for i in range(budget):
-        initial_active_nodes[i] = 1
-    random.shuffle(initial_active_nodes)
-
-    history = np.array([initial_active_nodes])
-    active_nodes = initial_active_nodes
-    newly_active_nodes = active_nodes
-    t = 0
-    while(t < n_steps_max and np.sum(newly_active_nodes) > 0):
-        p = (prob_matrix.T * active_nodes).T
-        activated_edges = p > np.random.rand(p.shape[0], p.shape[1])
-        prob_matrix = prob_matrix * ((p != 0) == activated_edges)
-        newly_active_nodes = (np.sum(activated_edges, axis=0) > 0) * (1-active_nodes)
-        active_nodes = np.array(active_nodes + newly_active_nodes)
-        history = np.concatenate((history, [newly_active_nodes]), axis=0)
-        t += 1
-    return history
-
-# We want to estimate the probability of edges of node_index.
-
-
-def estimate_node_message(dataset, message, list_nodes):
-    n_nodes = len(list_nodes)
-    list_credit = np.zeros(n_nodes)
-
-    for episode in dataset:
-        credit = 0
-        # What are the initial nodes ?
-        idx_initial = np.argwhere(episode[0] == 1).reshape(-1)
-        for index_steps in range(len(episode)):
-            # What are the nodes activated at each step ?
-            idx_w_active = np.argwhere(episode[index_steps] == 1).reshape(-1)
-            for num_node in idx_w_active:
-                if list_nodes[num_node].special_feature == message:
-                    credit += 1
-        # Upgrade credits of initial nodes.
-        for node_index in idx_initial:
-            list_credit[node_index] += credit/len(dataset)
-    return list_credit
-
-
-def check_attributes(list_num_nodes, list_nodes):
-    n = len(list_num_nodes)
-    attribute = []
-    for index in range(n):
-        attribute.append(list_nodes[list_num_nodes[index]].special_feature)
-    return attribute

@@ -89,7 +89,7 @@ class Node:
         age[np.random.randint(3)] = 1
         location[np.random.randint(7)] = 1
 
-        interests = np.random.randint(2, size=7)
+        interests = np.random.randint(2, size=6)
         # .tolist() transform the N dimanesional array (this case n=1) to a simple array, actually the same but more manageable
         selected_features: Feature = Feature(gender.tolist(), age.tolist(), interests.tolist(), location.tolist())
         return selected_features.features_dictionary()
@@ -122,18 +122,18 @@ class Edge:
             sum_diff = 0 # Compute the sum of the difference as it is written in the project.
             for i in range(len(head[feature])):
                 sum_diff += abs(head[feature][i] - tail[feature][i])
-            features_distance[feature] = round(1-sum_diff/len(head[feature]),2)
+            features_distance[feature] = round(1 - sum_diff/len(head[feature]),2)
         return features_distance
-        # [1,1,1,1] means we are really dissimilar while [0,0,0,0] implies the nodes have the same features.
 
     def measure_similarity_distance(self):
         fe = 0
         for key, value in normalizing_factor.items():
             if key == "interests":
-                fe += value*(1 - self.feature_distance[key]/6)
+                fe += value*(1 - self.feature_distance[key])
             else:
                 fe += value*(1 - self.feature_distance[key])
         fe += noise
+        # fe is equal to 1 in the perfect case where nodes are perfectly the same. In the other dual case, fe is equal to 0.
         return float(fe)
 
 class Graph:
@@ -167,6 +167,7 @@ class Graph:
                     self.adjacent_matrix[j].append(k)
                     k += 1
 
+    ## DEPRECATED
     ## Function transforming the Graph class into a JSON serializable
     def turn_self_dict(self):
         for i in range(self.numberNodes):
