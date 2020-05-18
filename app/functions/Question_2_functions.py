@@ -27,10 +27,10 @@ def estimate_node_message(dataset, message, list_nodes):
         # What are the initial nodes ?
         idx_initial = np.argwhere(episode[0] == 1).reshape(-1)
         for index_steps in range(len(episode)):
-            # What are the nodes activated at each step ?
+
             idx_w_active = np.argwhere(episode[index_steps] == 1).reshape(-1)
             for num_node in idx_w_active:
-                # If they are of type 'message', we give them credits. More a node have credits, more it is able to activate message_nodes.
+
                 if list_nodes[num_node].special_feature == message:
                     credit += 1
         # Upgrade credits of initial nodes.
@@ -39,7 +39,7 @@ def estimate_node_message(dataset, message, list_nodes):
 
         time_credit[i] = credit/len(dataset) + time_credit[i-1]
         i +=1
-    return [list_credit, time_credit] # Return the number of nodes approximately activated at each episode.
+    return [list_credit, time_credit]
 
 
 

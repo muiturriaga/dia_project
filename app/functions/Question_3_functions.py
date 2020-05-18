@@ -26,20 +26,20 @@ def get_edges_cascade(pull_node, list_edges_activated):
     return list_cascade_edges
 
 
-    # Find nodes who activate an A node.
+
 def credit_nodes(list_A_node_activated, list_edges_activated, pulled_super_arm):
     list_credit = [0]*len(pulled_super_arm)
     for i in range(len(pulled_super_arm)):
         pull_node = pulled_super_arm[i]
 
         if pull_node in list_A_node_activated:
-            list_credit[i] += 1 # If it is an initial node, we add 1 to his credit because it is possible that it has no edges.
+            list_credit[i] += 1
 
         tamp = get_edges_cascade(pull_node, list_edges_activated)
         if len(tamp) != 0:
             list_cascade_node = [num[1] for num in tamp] # get the inherited nodes from the cascade
             for node in list_cascade_node:
-                if node in list_A_node_activated: # add a credit if it activates an A node.
+                if node in list_A_node_activated:
                     list_credit[i] +=1
     return list_credit
 
@@ -47,9 +47,9 @@ def credit_nodes(list_A_node_activated, list_edges_activated, pulled_super_arm):
 
 def calculate_reward(pulled_super_arm, list_special_features_nodes, env):
     list_rewards_super_arm = [0] * len(pulled_super_arm)
-    env.update_proba(pulled_super_arm) # If we observe an edge activated, we update the probability of this edge.
+    env.update_proba(pulled_super_arm)
 
-    prob_matrix = np.zeros((env.n_nodes, env.n_nodes)) # Then we calculate the proba matrix of our network.
+    prob_matrix = np.zeros((env.n_nodes, env.n_nodes))
 
     index = 0
     for num_edges in env.list_num_edges:
@@ -88,9 +88,9 @@ class SocialEnvironment():
         self.budget = budget
 
     def update_proba(self, pulled_super_arm):
-        for num_node in pulled_super_arm: # pulled_super_arm = [13,12,4,9 ... ]
+        for num_node in pulled_super_arm:
             index = 0
-            for edges_num in self.list_num_edges: # list_num_edges = [ (1,3) , (3,4) ...]
+            for edges_num in self.list_num_edges:
                 if num_node == edges_num[0]:
                     if np.random.random() < self.p[index]:
                         self.estimated_p[index] += 1
@@ -118,7 +118,7 @@ class SocialUCBLearner():
             ucbs.append(ucb[0][0])
         return np.array(ucbs)
 
-    def pull_super_arm(self, budget): #We change pull_arm in pull_super_arm.
+    def pull_super_arm(self, budget):
         ucbs  = self.compute_cbs()
         super_ucbs = ucbs.argsort()[-budget:][::-1]
         return super_ucbs

@@ -56,4 +56,51 @@ def draw_graph(edges_info, nodes_info, color_map):
     nx.spring_layout(G_project)
     plt.show()
 
+def check_attributes(list_num_nodes, list_nodes):
+    n = len(list_num_nodes)
+    attribute = []
+    for index in range(n):
+        attribute.append(list_nodes[list_num_nodes[index]].special_feature)
+    return attribute
+
+def simulate_episode(init_prob_matrix, n_steps_max, budget, perfect_nodes):
+    prob_matrix = init_prob_matrix.copy()
+    n_nodes = prob_matrix.shape[0]
+
+    if len(perfect_nodes) == 0:
+        initial_active_nodes = np.zeros(n_nodes)
+        for i in range(budget):
+            initial_active_nodes[i] = 1
+        random.shuffle(initial_active_nodes)
+        # print('Initial active nodes are : ' , initial_active_nodes.nonzero()[0], '\n')
+    else :
+        initial_active_nodes = np.zeros(n_nodes)
+        for i in perfect_nodes:
+            initial_active_nodes[i] = 1
+
+    history = np.array([initial_active_nodes])
+    active_nodes = initial_active_nodes
+    newly_active_nodes = active_nodes
+
+    t = 0
+    list_new_activated_edges = []
+    while(t < n_steps_max and np.sum(newly_active_nodes) > 0):
+
+        p = (prob_matrix.T * active_nodes).T
+
+        activated_edges = p > np.random.rand(p.shape[0], p.shape[1])
+
+        prob_matrix = prob_matrix * ((p != 0) == activated_edges)
+
+        newly_active_nodes = (np.sum(activated_edges, axis=0) > 0) * (1-active_nodes)
+
+
+        for i in np.argwhere(activated_edges == True):
+            if (list(i) not in list_new_activated_edges) & (active_nodes[i[1]] == 0):
+                list_new_activated_edges.append(list(i))
+
+        active_nodes = np.array( active_nodes + newly_active_nodes)
+        history = np.concatenate((history, [newly_active_nodes]), axis=0)
+        t += 1
+    return history, list_new_activated_edges
 
