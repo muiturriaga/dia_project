@@ -22,7 +22,7 @@ from networkx.algorithms import bipartite
 
 bool_affichage = True
 N_nodes = 100
-Edges_info, Nodes_info, Color_map = create_graph(['A'], ['B','C'], N_nodes, 0.01)
+Edges_info, Nodes_info, Color_map = create_graph(['A'], ['B','C'], N_nodes, 0.05)
 
 if bool_affichage == True :
     test = []
@@ -43,10 +43,10 @@ for edge in Edges_info[1]:
     # If we consider the graph is undirected, we have to add edges between tail and head.
 
 Dataset = []
-# Specify a superarm of nodes to study. We want to know if it is useful to activate this superarm. For that purpose, we have to calculate how many nodes it activates in average. And how many are A nodes. Initially our budget has to be spread between nodes of type A.
+
 Message = 'A'
 for e in range(0,N_episodes):
-    Dataset.append(simulate_episode(init_prob_matrix = Prob_matrix, n_steps_max = 100, budget = Budget, perfect_nodes = []))[0]
+    Dataset.append(simulate_episode(init_prob_matrix = Prob_matrix, n_steps_max = 100, budget = Budget, perfect_nodes = [])[0])
 
 [estimated_best_nodes, cumulative_reward] = estimate_node_message(dataset = Dataset, message = Message, list_nodes = Nodes_info[2])
 
@@ -57,7 +57,6 @@ attributes = check_attributes(estimated_best_nodes, Nodes_info[2])
 print(estimated_best_nodes, attributes)
 
 
-# Plot the regret. We are estimating the best superam using our precedent result.
 SuperDataset = []
 for e in range(0,N_episodes):
     SuperDataset.append(simulate_episode(init_prob_matrix = Prob_matrix, n_steps_max = 100, budget = Budget, perfect_nodes = estimated_best_nodes)[0])

@@ -34,7 +34,7 @@ if bool_affichage == True :
 # Arms are our nodes. A superarm is a collection of nodes given a certain budget. Our environment is characterized by nodes and a budget. We do not know the activation probabilities of edges.
 
 T = 10
-n_experiments = 100
+n_experiments = 1000
 Lin_social_ucb_rewards_per_experiment = []
 Budget = int(N_nodes/10)
 arms_features = get_list_features(Nodes_info[2], dim = 19)
