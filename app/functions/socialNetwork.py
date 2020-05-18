@@ -96,19 +96,20 @@ class Node:
 
 class Edge:
     def __init__(self, Node_1: Node, Node_2: Node, old = False):
-        # It's not a good idea to save again the entire node as head or tail.
         self.head = Node_1.id
         self.tail = Node_2.id
         # old == False means that the Edge is NEW, so we'll compute the feature_distance
         # old == True (or whatelse) means that we are loading the SN from a json file
         if old == False:
             self.feature_distance = self.calculate_features_distance(Node_1, Node_2)
+            self.features = self.get_features(Node_1, Node_2)
             self.similarity_distance = self.measure_similarity_distance()
             self.theta = np.random.dirichlet(np.ones(len(self.feature_distance)), size=1).tolist() #tolist() to avoid numpy.ndarray
             # probability of activation based on the similarity_distance
             self.proba_activation = math.exp(-self.similarity_distance**2)
         else: # load existent Edge
             self.feature_distance = old.get('feature_distance')
+            self.features = old.get('features')
             self.similarity_distance = float(old.get('similarity_distance'))
             self.theta = old.get('theta')
             self.proba_activation = old.get('proba_activation')
@@ -118,11 +119,13 @@ class Edge:
         features_distance = {}
         head = node1.features
         tail = node2.features
-        # Map to convert into float type, instead of using int32 of numpy
-        # Actually it can be also int instead of float, Tara please confirm it.
         for feature in head:
-            features_distance[feature] = float(np.dot(head[feature], tail[feature]))
+            sum_diff = 0 # Compute the sum of the difference as it is written in the project.
+            for i in range(len(head[feature])):
+                sum_diff += abs(head[feature][i] - tail[feature][i])
+            features_distance[feature] = round(sum_diff/len(head[feature]),2)
         return features_distance
+        # [1,1,1,1] means we are really dissimilar while [0,0,0,0] implies the nodes have the same features.
 
     def measure_similarity_distance(self):
         fe = 0
@@ -297,6 +300,6 @@ def spread_message_SN(SN : Graph, typeMessage, list_seeds_nodes, multipletimeinf
 
 
 ## YOU CAN TRY THE CODE HERE
-#erase = '\x1b[1A\x1b[2K'
-SN = import_social_network(1000,0.1)
-#spread_message_SN(SN, "A", [1,3,4,5,6,7,8])
+# erase = '\x1b[1A\x1b[2K'
+# SN = import_social_network(1000,0.1)
+# #spread_message_SN(SN, "A", [1,3,4,5,6,7,8])
