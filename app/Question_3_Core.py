@@ -34,8 +34,8 @@ if bool_affichage == True :
 # Arms are our nodes. A superarm is a collection of nodes given a certain budget. Our environment is characterized by nodes and a budget. We do not know the activation probabilities of edges.
 
 T = 10
-n_experiments = 100
-lin_social_ucb_rewards_per_experiment = []
+n_experiments = 1000
+Lin_social_ucb_rewards_per_experiment = []
 Budget = int(N_nodes/10)
 arms_features = get_list_features(Nodes_info[2], dim = 19)
 
@@ -44,22 +44,19 @@ for edge in Edges_info[1]:
     List_proba_edges.append(edge.proba_activation)
 
 List_special_features_nodes = [ node.special_feature for node in Nodes_info[2]]
-
-envir = SocialEnvironment(Edges_info[0], List_proba_edges, N_nodes, 'A', Budget)
+Env = SocialEnvironment(Edges_info[0], List_proba_edges, N_nodes, 'A', Budget)
 
 for e in range(0,n_experiments):
-    lin_social_ucb_learner = SocialUCBLearner(arms_features = arms_features , budget = Budget)
+    Lin_social_ucb_learner = SocialUCBLearner(arms_features = arms_features , budget = Budget)
     for t in range(0,T):
-        pulled_super_arm = lin_social_ucb_learner.pull_super_arm(Budget)
-        reward = calculate_reward(pulled_super_arm, List_special_features_nodes ,envir)
-# here.
-        lin_social_ucb_learner.update(pulled_super_arm, reward)
-        lin_social_ucb_rewards_per_experiment.append(lin_social_ucb_learner.collected_rewards)
+        Pulled_super_arm = Lin_social_ucb_learner.pull_super_arm(Budget)
+        List_reward = calculate_reward(Pulled_super_arm, List_special_features_nodes ,Env)
+        Lin_social_ucb_learner.update(Pulled_super_arm, List_reward)
+        Lin_social_ucb_rewards_per_experiment.append(Lin_social_ucb_learner.collected_rewards)
 
-opt = envir.opt()
 plt.figure(0)
 plt.ylabel("Regret")
 plt.xlabel("t")
-plt.plot(np.cumsum(np.mean(opt - lin_social_ucb_rewards_per_experiment, axis = 0)), 'r')
+plt.plot(np.cumsum(np.mean(Lin_social_ucb_rewards_per_experiment, axis = 0)), 'r')
 plt.legend(["LinUCB"])
 plt.show()
