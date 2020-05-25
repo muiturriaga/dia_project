@@ -1,4 +1,5 @@
-from app.functions.Tools import *
+from Tools import *
+import numpy as np
 
 def get_list_features(list_of_nodes, dim):
     list_features = [[0]*dim]*len(list_of_nodes)

@@ -5,16 +5,17 @@
 # The activation probabilities are not known but activation of edges are known.
 # The budget is constant over experiences.
 
-import os
-os.chdir("C:/Users/Loick/Documents/Ecole Nationale des Ponts et Chaussées/2A/Erasmus Milan/Data Analysis/dia_project-master")
+#import os
+#os.chdir("C:/Users/Loick/Documents/Ecole Nationale des Ponts et Chaussées/2A/Erasmus Milan/Data Analysis/dia_project-master")
 
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 import random
 
-from app.functions.socialNetwork import *
-from app.functions.Question_3_functions import *
+from functions.socialNetwork import *
+from functions.Question_2_functions import *
+from functions.Question_3_functions import *
 from networkx.algorithms import bipartite
 
 
