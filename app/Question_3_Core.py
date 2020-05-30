@@ -5,23 +5,21 @@
 # The activation probabilities are not known but activation of edges are known.
 # The budget is constant over experiences.
 
-#import os
-#os.chdir("C:/Users/Loick/Documents/Ecole Nationale des Ponts et Chaussées/2A/Erasmus Milan/Data Analysis/dia_project-master")
+import os
+os.chdir("C:/Users/Loick/Documents/Ecole Nationale des Ponts et Chaussées/2A/Erasmus Milan/Data Analysis/dia_project-master")
 
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 import random
 
-from functions.socialNetwork import *
-from functions.Question_2_functions import *
-from functions.Question_3_functions import *
+from app.functions.socialNetwork import *
+from app.functions.Question_3_functions import *
 from networkx.algorithms import bipartite
 
 
-bool_affichage = True
-N_nodes = 100
-Edges_info, Nodes_info, Color_map = create_graph(['A'], ['B','C'], N_nodes, 0.02)
+
+Edges_info, Nodes_info, Color_map = create_graph(['A'], ['B','C'], N_nodes, proba_edges)
 
 if bool_affichage == True :
     test = []
@@ -32,12 +30,13 @@ if bool_affichage == True :
 
 
 ## 2. Design Algorithm.
-# Arms are our nodes. A superarm is a collection of nodes given a certain budget. Our environment is characterized by nodes and a budget. We do not know the activation probabilities of edges.
+# Assumptions :
+# Arms are our nodes.
+# A superarm is a collection of nodes given a certain budget.
+# Our environment is characterized by nodes and a budget.
+# We do not know the activation probabilities of edges.
 
-T = 10
-n_experiments = 1000
 Lin_social_ucb_rewards_per_experiment = []
-Budget = int(N_nodes/10)
 arms_features = get_list_features(Nodes_info[2], dim = 19)
 
 List_proba_edges = []
@@ -45,19 +44,16 @@ for edge in Edges_info[1]:
     List_proba_edges.append(edge.proba_activation)
 
 List_special_features_nodes = [ node.special_feature for node in Nodes_info[2]]
-Env = SocialEnvironment(Edges_info[0], List_proba_edges, N_nodes, 'A', Budget)
 
-for e in range(0,n_experiments):
+for e in range(0,100):
+    Env = SocialEnvironment(Edges_info[0], List_proba_edges, N_nodes, 'A', Budget)
     Lin_social_ucb_learner = SocialUCBLearner(arms_features = arms_features , budget = Budget)
-    for t in range(0,T):
+    for t in range(0,1000):
         Pulled_super_arm = Lin_social_ucb_learner.pull_super_arm(Budget)
-        List_reward = calculate_reward(Pulled_super_arm, List_special_features_nodes ,Env)
+        List_reward = calculate_reward(Pulled_super_arm , Env)
         Lin_social_ucb_learner.update(Pulled_super_arm, List_reward)
-        Lin_social_ucb_rewards_per_experiment.append(Lin_social_ucb_learner.collected_rewards)
 
-plt.figure(0)
-plt.ylabel("Regret")
-plt.xlabel("t")
-plt.plot(np.cumsum(np.mean(Lin_social_ucb_rewards_per_experiment, axis = 0)), 'r')
-plt.legend(["LinUCB"])
-plt.show()
+        # Save the rewards of each experiments. So it is composed of n_experiments*T numbers. We are basically doing a mean on experiments in order to have the average number of rewards at each step.
+    Lin_social_ucb_rewards_per_experiment.append(Lin_social_ucb_learner.collected_rewards)
+
+mean = np.mean(Lin_social_ucb_rewards_per_experiment, axis= 0)
