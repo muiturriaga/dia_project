@@ -1,5 +1,5 @@
-from Tools import *
-import numpy as np
+from app.functions.Tools import *
+
 
 def get_list_features(list_of_nodes, dim):
     list_features = [[0]*dim]*len(list_of_nodes)
@@ -27,54 +27,51 @@ def get_edges_cascade(pull_node, list_edges_activated):
     return list_cascade_edges
 
 
-
+    # Find nodes who activate an A node.
 def credit_nodes(list_A_node_activated, list_edges_activated, pulled_super_arm):
     list_credit = [0]*len(pulled_super_arm)
     for i in range(len(pulled_super_arm)):
         pull_node = pulled_super_arm[i]
 
         if pull_node in list_A_node_activated:
+# If it is an initial node, we add 1 to his credit because it is possible that it has no edges.
             list_credit[i] += 1
 
         tamp = get_edges_cascade(pull_node, list_edges_activated)
         if len(tamp) != 0:
             list_cascade_node = [num[1] for num in tamp] # get the inherited nodes from the cascade
             for node in list_cascade_node:
-                if node in list_A_node_activated:
+                if node in list_A_node_activated: # add a credit if it activates an A node.
                     list_credit[i] +=1
+
     return list_credit
 
 
 
-def calculate_reward(pulled_super_arm, list_special_features_nodes, env):
+def calculate_reward(pulled_super_arm, env):
     list_rewards_super_arm = [0] * len(pulled_super_arm)
+    # If we observe an edge activated, we update the probability of this edge.
     env.update_proba(pulled_super_arm)
 
+    # Then we calculate the proba matrix of our network.
     prob_matrix = np.zeros((env.n_nodes, env.n_nodes))
-
     index = 0
     for num_edges in env.list_num_edges:
         prob_matrix[num_edges[0], num_edges[1]] = env.estimated_p[index]/(env.age)
         index +=1
 
-    [episode , list_edges_activated]= simulate_episode(init_prob_matrix = prob_matrix, n_steps_max = 100, budget = env.budget, perfect_nodes =  pulled_super_arm) # Simulate an episode.
+    # Simulate an episode.
+    [episode , list_edges_activated]= simulate_episode(init_prob_matrix = prob_matrix, n_steps_max = 100, budget = env.budget, perfect_nodes =  pulled_super_arm)
 
-    credit = 0
-    list_A_node_activated = []
 
-    for index_steps in range(len(episode)): # What are the nodes activated at each step ?
-        idx_w_active = np.argwhere(episode[index_steps] == 1).reshape(-1)
-        for num_node in idx_w_active:
-            if list_special_features_nodes[num_node] == env.message:
-                list_A_node_activated.append(num_node)
+    # We count only nodes activated regardless of their message.
+    credits_of_each_node, score_by_seeds_history = estimate_node_message(dataset = [episode], dataset_edges = [list_edges_activated], list_nodes = Nodes_info[2])
 
-    # print('I pull the super_arm : \n', pulled_super_arm)
-    # print('\n', ' Edges activated in my episode are : \n', list_edges_activated)
-    # print('\n', ' Nodes A activated in my episode are : \n', list_A_node_activated)
-    # print('\n', check_attributes(list_A_node_activated, Nodes_info[2]))
+    i = 0
+    for node in pulled_super_arm:
+        list_rewards_super_arm[i] = credits_of_each_node[node]
+        i +=1
 
-    # We go up the tree of successive edges in order to find the node which has activated an A node. Then we give it a credit.
-    list_rewards_super_arm = credit_nodes(list_A_node_activated, list_edges_activated, pulled_super_arm)
     return list_rewards_super_arm
 
 
@@ -89,9 +86,9 @@ class SocialEnvironment():
         self.budget = budget
 
     def update_proba(self, pulled_super_arm):
-        for num_node in pulled_super_arm:
+        for num_node in pulled_super_arm: # pulled_super_arm = [13,12,4,9 ... ]
             index = 0
-            for edges_num in self.list_num_edges:
+            for edges_num in self.list_num_edges: # list_num_edges = [ (1,3) , (3,4) ...]
                 if num_node == edges_num[0]:
                     if np.random.random() < self.p[index]:
                         self.estimated_p[index] += 1

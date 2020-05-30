@@ -69,7 +69,7 @@ class Node:
         self.total_neighbor_activated_cascade = 0
         self.activated_by_same_type = False
         self.special_feature = special_feature if special_feature is not None else np.random.choice(
-            ['A', 'B', 'C'], 1, p=[0.28, 0.28, 0.44])[0] #[0] to have the feature equal to a str "A", not =["A"] ##faster and lighter
+            ['A', 'B', 'C'], 1, p=[0.33, 0.33, 0.34])[0] #[0] to have the feature equal to a str "A", not =["A"] ##faster and lighter
         if old_features_dict == None:
             self.features: dict = self.create_features(num)
         else:
