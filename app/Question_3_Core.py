@@ -31,11 +31,7 @@ if bool_affichage == True :
 
 
 ## 2. Design Algorithm.
-# Assumptions :
-# Arms are our nodes.
-# A superarm is a collection of nodes given a certain budget.
-# Our environment is characterized by nodes and a budget.
-# We do not know the activation probabilities of edges.
+## Learning Process
 
 Lin_social_ucb_rewards_per_experiment = []
 List_best_super_arms_per_experiment = []
@@ -47,9 +43,13 @@ for edge in Edges_info[1]:
     List_proba_edges.append(edge.proba_activation)
 
 List_special_features_nodes = [ node.special_feature for node in Nodes_info[2]]
+Env = SocialEnvironment(Edges_info[0], List_proba_edges, N_nodes, 'A', Budget, bool_track = False)
 
+compt = 0
 for e in range(0,N_episodes):
-    Env = SocialEnvironment(Edges_info[0], List_proba_edges, N_nodes, 'A', Budget, bool_knowledge = False, bool_track = False)
+    if compt%20 == 0:
+        print(e)
+    compt +=1
     Lin_social_ucb_learner = SocialUCBLearner(arms_features = arms_features , budget = Budget)
     for t in range(0,T):
         Pulled_super_arm = Lin_social_ucb_learner.pull_super_arm(Budget)
@@ -64,12 +64,13 @@ for e in range(0,N_episodes):
     List_best_super_arms_per_experiment.append(Best_super_arms_experiment)
     List_best_rewards_per_experiment.append([Lin_social_ucb_learner.collected_rewards_arms[i]/(Lin_social_ucb_learner.nbr_calls_arms[i]) for i in Best_super_arms_experiment])
 
-opt = np.mean(np.array([i for i in List_best_rewards_per_experiment]))
+opt = np.mean(np.array([i for i in List_best_rewards_per_experiment]), axis = 0)
 mean = np.mean(Lin_social_ucb_rewards_per_experiment, axis= 0)
+
 
 plt.figure(0)
 plt.ylabel("Regret")
 plt.xlabel("t")
-plt.plot(np.cumsum(opt - mean), 'r')
+plt.plot(np.cumsum(opt - np.sort(mean, 0)), 'r')
 plt.legend(["LinUCB"])
 plt.show()
