@@ -3,7 +3,6 @@ import numpy as np
 class SocialEnvironment():
     def __init__(self,list_num_edges,  list_proba_edges, n_nodes, message,  budget, bool_track):
         # Probabilities of edges are supposed to be unknown, so we can  not use them directly. However we can estimate it with round.
-        self.p = list_proba_edges
         self.estimated_p = [0]*len(list_proba_edges)
         self.message = message
         self.age = 1
@@ -12,16 +11,13 @@ class SocialEnvironment():
         self.bool_track = bool_track
         self.budget = budget
 
-
-    def update_proba(self, pulled_super_arm):
-        for num_node in pulled_super_arm: # pulled_super_arm = [13,12,4,9 ... ]
-            index = 0
-            for edges_num in self.list_num_edges: # list_num_edges = [ (1,3) , (3,4) ...]
-                if num_node == edges_num[0]:
-                    if np.random.random() < self.p[index]:
-                        self.estimated_p[index] += 1
-                index +=1
-        self.age +=1
+        # Then we calculate the proba matrix of our network.
+        prob_matrix = np.zeros((n_nodes, n_nodes))
+        index = 0
+        for num_edges in list_num_edges:
+            prob_matrix[num_edges[0], num_edges[1]] = list_proba_edges[index]
+            index +=1
+        self.p = prob_matrix
 
 
 class SocialUCBLearner():

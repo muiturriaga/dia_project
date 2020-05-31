@@ -8,8 +8,8 @@ import random
 # Multiple file variables
 
 bool_affichage = False
-N_nodes = 1000
-proba_edges = np.log(N_nodes)/N_nodes
+N_nodes = 100
+proba_edges = np.log(N_nodes)/(2*N_nodes)
 Budget = int(np.log(N_nodes))
 N_episodes = 100
 T = 1000

@@ -38,15 +38,8 @@ def credit_nodes(list_A_node_activated, list_edges_activated, pulled_super_arm):
 def calculate_reward(pulled_super_arm, env, list_nodes_info):
     list_rewards_super_arm = [0] * len(pulled_super_arm)
 
-    # Then we calculate the proba matrix of our network.
-    prob_matrix = np.zeros((env.n_nodes, env.n_nodes))
-    index = 0
-    for num_edges in env.list_num_edges:
-        prob_matrix[num_edges[0], num_edges[1]] = env.p[index]
-        index +=1
-
     # Simulate an episode.
-    [episode , list_edges_activated]= simulate_episode(init_prob_matrix = prob_matrix, n_steps_max = 100, budget = env.budget, perfect_nodes =  pulled_super_arm)
+    [episode , list_edges_activated]= simulate_episode(init_prob_matrix = env.p, n_steps_max = 100, budget = env.budget, perfect_nodes =  pulled_super_arm)
 
     # print(episode, '\n')
     # print(list_edges_activated, '\n')
