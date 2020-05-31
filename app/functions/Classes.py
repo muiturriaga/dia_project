@@ -1,7 +1,7 @@
 import numpy as np
 
 class SocialEnvironment():
-    def __init__(self,list_num_edges,  list_proba_edges, n_nodes, message,  budget, bool_knowledge, bool_track):
+    def __init__(self,list_num_edges,  list_proba_edges, n_nodes, message,  budget, bool_track):
         # Probabilities of edges are supposed to be unknown, so we can  not use them directly. However we can estimate it with round.
         self.p = list_proba_edges
         self.estimated_p = [0]*len(list_proba_edges)
@@ -12,8 +12,6 @@ class SocialEnvironment():
         self.bool_track = bool_track
         self.budget = budget
 
-        # If bool_knowledge_proba = True, we know the probability of activation. Else we do not.
-        self.bool_knowledge_proba = bool_knowledge
 
     def update_proba(self, pulled_super_arm):
         for num_node in pulled_super_arm: # pulled_super_arm = [13,12,4,9 ... ]
