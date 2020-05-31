@@ -14,6 +14,7 @@ import numpy as np
 import random
 
 from app.functions.socialNetwork import *
+from app.functions.Classes import *
 from app.functions.Question_3_functions import *
 from networkx.algorithms import bipartite
 
@@ -37,6 +38,8 @@ if bool_affichage == True :
 # We do not know the activation probabilities of edges.
 
 Lin_social_ucb_rewards_per_experiment = []
+List_best_super_arms_per_experiment = []
+List_best_rewards_per_experiment = []
 arms_features = get_list_features(Nodes_info[2], dim = 19)
 
 List_proba_edges = []
@@ -45,15 +48,28 @@ for edge in Edges_info[1]:
 
 List_special_features_nodes = [ node.special_feature for node in Nodes_info[2]]
 
-for e in range(0,100):
-    Env = SocialEnvironment(Edges_info[0], List_proba_edges, N_nodes, 'A', Budget)
+for e in range(0,N_episodes):
+    Env = SocialEnvironment(Edges_info[0], List_proba_edges, N_nodes, 'A', Budget, bool_knowledge = False, bool_track = False)
     Lin_social_ucb_learner = SocialUCBLearner(arms_features = arms_features , budget = Budget)
-    for t in range(0,1000):
+    for t in range(0,T):
         Pulled_super_arm = Lin_social_ucb_learner.pull_super_arm(Budget)
-        List_reward = calculate_reward(Pulled_super_arm , Env)
+        List_reward = calculate_reward(Pulled_super_arm , Env, Nodes_info[2])
         Lin_social_ucb_learner.update(Pulled_super_arm, List_reward)
 
         # Save the rewards of each experiments. So it is composed of n_experiments*T numbers. We are basically doing a mean on experiments in order to have the average number of rewards at each step.
-    Lin_social_ucb_rewards_per_experiment.append(Lin_social_ucb_learner.collected_rewards)
 
+    Best_super_arms_experiment = np.argsort(Lin_social_ucb_learner.nbr_calls_arms)[::-1][0:Budget]
+
+    Lin_social_ucb_rewards_per_experiment.append(Lin_social_ucb_learner.collected_rewards)
+    List_best_super_arms_per_experiment.append(Best_super_arms_experiment)
+    List_best_rewards_per_experiment.append([Lin_social_ucb_learner.collected_rewards_arms[i]/(Lin_social_ucb_learner.nbr_calls_arms[i]) for i in Best_super_arms_experiment])
+
+opt = np.mean(np.array([i for i in List_best_rewards_per_experiment]))
 mean = np.mean(Lin_social_ucb_rewards_per_experiment, axis= 0)
+
+plt.figure(0)
+plt.ylabel("Regret")
+plt.xlabel("t")
+plt.plot(np.cumsum(opt - mean), 'r')
+plt.legend(["LinUCB"])
+plt.show()
