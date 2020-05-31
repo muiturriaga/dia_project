@@ -52,6 +52,7 @@ for edge in Edges_info[1]:
 N_episodes = int(calculate_minimum_rep(0.05,0.01,Budget))
 
 compt = 0
+print('The number of episodes is : ' , N_episodes)
 for e in range(0,N_episodes):
     if compt%20 == 0:
         print(e)

@@ -46,31 +46,46 @@ List_special_features_nodes = [ node.special_feature for node in Nodes_info[2]]
 Env = SocialEnvironment(Edges_info[0], List_proba_edges, N_nodes, 'A', Budget, bool_track = False)
 
 compt = 0
+print('The number of episodes is : ' , N_episodes)
 for e in range(0,N_episodes):
-    if compt%20 == 0:
-        print(e)
+    if compt%5 == 0:
+        print('Number of episode ', e)
     compt +=1
     Lin_social_ucb_learner = SocialUCBLearner(arms_features = arms_features , budget = Budget)
+    compt_time = 0
     for t in range(0,T):
+        if compt_time%20 == 0:
+            print(t)
+        compt_time +=1
         Pulled_super_arm = Lin_social_ucb_learner.pull_super_arm(Budget)
         List_reward = calculate_reward(Pulled_super_arm , Env, Nodes_info[2])
         Lin_social_ucb_learner.update(Pulled_super_arm, List_reward)
 
         # Save the rewards of each experiments. So it is composed of n_experiments*T numbers. We are basically doing a mean on experiments in order to have the average number of rewards at each step.
 
-    Best_super_arms_experiment = np.argsort(Lin_social_ucb_learner.nbr_calls_arms)[::-1][0:Budget]
+    List_average_reward = [ round(Lin_social_ucb_learner.collected_rewards_arms[i]/(Lin_social_ucb_learner.nbr_calls_arms[i]),5) for i in range(0,N_nodes)]
 
-    Lin_social_ucb_rewards_per_experiment.append(Lin_social_ucb_learner.collected_rewards)
+    for i in range(len(List_average_reward)):
+        if math.isnan(List_average_reward[i]) == True:
+            List_average_reward[i] = 0
+
+    Best_super_arms_experiment = np.argsort(List_average_reward)[::-1][0:Budget]
+
+    if Env.bool_track == False:
+        Lin_social_ucb_rewards_per_experiment.append([ [Lin_social_ucb_learner.collected_rewards[i][0]] for i in range(len(Lin_social_ucb_learner.collected_rewards))])
+    else :
+        Lin_social_ucb_rewards_per_experiment.append([ [np.sum(Lin_social_ucb_learner.collected_rewards[i])] for i in range(len(Lin_social_ucb_learner.collected_rewards))])
+
     List_best_super_arms_per_experiment.append(Best_super_arms_experiment)
-    List_best_rewards_per_experiment.append([Lin_social_ucb_learner.collected_rewards_arms[i]/(Lin_social_ucb_learner.nbr_calls_arms[i]) for i in Best_super_arms_experiment])
+    List_best_rewards_per_experiment.append([List_average_reward[i] for i in Best_super_arms_experiment])
 
-opt = np.mean(np.array([i for i in List_best_rewards_per_experiment]), axis = 0)
+opt = np.mean(np.array([np.mean(np.array(i)) for i in List_best_rewards_per_experiment]), axis = 0)
 mean = np.mean(Lin_social_ucb_rewards_per_experiment, axis= 0)
 
-
 plt.figure(0)
+plt.title("100 nodes, time = 1000, n_episodes = 100")
 plt.ylabel("Regret")
 plt.xlabel("t")
-plt.plot(np.cumsum(opt - np.sort(mean, 0)), 'r')
+plt.plot(np.cumsum(opt - mean ), 'r')
 plt.legend(["LinUCB"])
 plt.show()
