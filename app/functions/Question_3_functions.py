@@ -1,4 +1,4 @@
-from app.functions.Tools import *
+from .Tools import *
 
 
 def get_edges_cascade(pull_node, list_edges_activated):

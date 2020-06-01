@@ -24,6 +24,7 @@ class SocialUCBLearner():
     def __init__(self, arms_features, budget):
         self.arms = arms_features
         self.dim = arms_features.shape[1]
+        self.budget = budget
         self.collected_rewards = []
         self.pulled_arms = []
         self.c = 2.0
@@ -43,10 +44,10 @@ class SocialUCBLearner():
         return np.array(ucbs)
 
 
-    def pull_super_arm(self, budget):
+    def pull_super_arm(self):
         ucbs  = self.compute_cbs()
        # print(ucbs)
-        super_ucbs = ucbs.argsort()[-budget:][::-1]
+        super_ucbs = ucbs.argsort()[-self.budget:][::-1]
         return super_ucbs
 
     def update_estimation(self, pulled_super_arm_idx, list_reward):
