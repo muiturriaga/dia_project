@@ -1,5 +1,5 @@
 from .Tools import *
-
+import numpy as np
 
 def get_edges_cascade(pull_node, list_edges_activated):
     list_new_nodes = [pull_node]
@@ -41,17 +41,21 @@ def calculate_reward(pulled_super_arm, env, list_nodes_info):
     # Simulate an episode.
     [episode , list_edges_activated]= simulate_episode(init_prob_matrix = env.p, n_steps_max = 100, budget = env.budget, perfect_nodes =  pulled_super_arm)
 
-    # print(episode, '\n')
-    # print(list_edges_activated, '\n')
-
     # We count only nodes activated regardless of their message. If track = True then we assign rewards at a specific node by tracing the root. If track = False we give the same rewards to all the nodes.
-    credits_of_each_node, score_by_seeds_history = credits_assignement(dataset = [episode], dataset_edges = [list_edges_activated], list_nodes = list_nodes_info, track = env.bool_track)
+    credits_of_each_node, score_by_seeds_history, nbr_activates = credits_assignement(dataset = [episode], dataset_edges = [list_edges_activated], list_nodes = list_nodes_info, track = env.bool_track)
 
     # print(credits_of_each_node, '\n')
 
-    i = 0
-    for node in pulled_super_arm:
-        list_rewards_super_arm[i] = (credits_of_each_node[node])/(len(list_nodes_info))
-        i +=1
+    if env.bool_track == False:
+        i = 0
+        for node in pulled_super_arm:
+            list_rewards_super_arm[i] = (credits_of_each_node[node])/(len(list_nodes_info)) #practilly is the % of nodes activated in the  network
+            i +=1
+    else:
+        i = 0
+        for node in pulled_super_arm:
+            list_rewards_super_arm[i] = (credits_of_each_node[node]/len(list_nodes_info))  
+            i +=1
+
 
     return list_rewards_super_arm

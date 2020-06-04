@@ -123,8 +123,8 @@ def simulate_episode(init_prob_matrix, n_steps_max, budget, perfect_nodes):
 def credits_assignement(dataset, dataset_edges, list_nodes, track = bool):
     n_nodes = len(list_nodes)
     list_credit = np.zeros(n_nodes)
-    score_by_seeds_history = np.empty([n_nodes,len(dataset)])
-    score_by_seeds_history[:] = np.NaN
+    score_by_seeds_history = np.zeros([n_nodes,len(dataset)])
+    #score_by_seeds_history[:] = np.NaN
 
     for i in range(0,len(dataset)):
         episode = dataset[i]
@@ -132,7 +132,7 @@ def credits_assignement(dataset, dataset_edges, list_nodes, track = bool):
         history_edges = dataset_edges[i]
         list_credit_steps = np.zeros(n_nodes)
 
-            # Catch the initial nodes
+        # Catch the initial nodes
         idx_initial = np.argwhere(episode[0] == 1).reshape(-1)
 
 
@@ -148,6 +148,7 @@ def credits_assignement(dataset, dataset_edges, list_nodes, track = bool):
         # print(list_credit_steps)
         # print(list_activated)
 
+        nbr_activates = max(np.sum(list_activated),0)
         # Upgrade credits of initial nodes.
         if track == True :
             for id in idx_initial:
@@ -156,12 +157,12 @@ def credits_assignement(dataset, dataset_edges, list_nodes, track = bool):
 
         # If track = False, we assign to initial nodes, the sum of activated nodes.
         elif track == False :
-            nbr_activates = np.sum(list_activated)
             for id in idx_initial:
                 score_by_seeds_history[id][i] = nbr_activates
                 list_credit[id] = nbr_activates
+    #print(score_by_seeds_history)
 
-    return list_credit, score_by_seeds_history
+    return list_credit, score_by_seeds_history, nbr_activates
 
 
 
