@@ -3,6 +3,7 @@ import math
 import random
 import json
 import time
+import networkx as nx
 from queue import Queue
 from typing import Dict, Any
 
@@ -194,7 +195,6 @@ class Graph:
             node_head_id = v['head']
             node_tail_id = v['tail']
             self.list_edges.append(Edge(self.list_nodes[node_head_id], self.list_nodes[node_tail_id], v))
-
 
 
     ## Function returning a list of all the nodes of the type desired

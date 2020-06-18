@@ -1,4 +1,4 @@
-from .Tools import *
+from Tools import *
 
 
 ## Question 2.

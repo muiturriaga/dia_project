@@ -1,7 +1,7 @@
 import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
-from .socialNetwork import Node, Edge
+from socialNetwork import Node, Edge
 from networkx.algorithms import bipartite
 import random
 

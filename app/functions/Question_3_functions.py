@@ -1,4 +1,4 @@
-from .Tools import *
+from Tools import *
 import numpy as np
 
 def get_edges_cascade(pull_node, list_edges_activated):
@@ -54,7 +54,7 @@ def calculate_reward(pulled_super_arm, env, list_nodes_info):
     else:
         i = 0
         for node in pulled_super_arm:
-            list_rewards_super_arm[i] = (credits_of_each_node[node]/len(list_nodes_info))  
+            list_rewards_super_arm[i] = (credits_of_each_node[node]/len(list_nodes_info))
             i +=1
 
 
