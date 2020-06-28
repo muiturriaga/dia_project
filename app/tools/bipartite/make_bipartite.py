@@ -47,7 +47,10 @@ class Make_Bipartite:
                     weight = prob_bernouli * constant
                 else:
                     ## error [][] instead [ , ]
-                    edge_prob = self.p[i-1, j-1]
+                    if self.p != []:
+                        edge_prob = self.p[i-1, j-1]
+                    else:
+                        edge_prob = p;
                     weight = prob_bernouli * edge_prob
 
                 self.flag = 1

@@ -67,7 +67,7 @@ for budget_alloc in budget_alloc_vect:  # for every possible budget allocation
     bip_graph_edges = bip.Make_Bipartite(activated_nodes)
     bip_graph_edges.calculate_probability()
     bip_graph_edges.make_bipartite()
-    matching_value = matching.Matching(bip_graph_edges).weight_of_matched_list()
+    matching_value = matching.Matching(bip_graph_edges.list_of_edges).weight_of_matched_list()
 
     if max_value < matching_value:  # select best budget
         best_budget = budget_alloc
