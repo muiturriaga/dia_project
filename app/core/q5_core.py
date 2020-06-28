@@ -71,5 +71,6 @@ for budget_alloc in budget_alloc_vect:  # for every possible budget allocation
 
     if max_value < matching_value:  # select best budget
         best_budget = budget_alloc
+        max_value=matching_value
 
 print("Best budget is: ", best_budget)
