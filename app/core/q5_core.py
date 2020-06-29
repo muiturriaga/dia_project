@@ -40,14 +40,13 @@ print("seeds b: ", seeds_B)
 seeds_C = q5_tools.select_seeds(cum_budget, n_nodes, edges_info[1], nodes_info[1], message = "C")
 print("seeds c: ", seeds_C)
 
-# main cycle, enumeration
+# inner cycle, enumeration
 for budget_alloc in budget_alloc_vect:  # for every possible budget allocation
 
     starting_nodes_A = random.sample(seeds_A, budget_alloc[0])
     starting_nodes_B = random.sample(seeds_B, budget_alloc[1])
     starting_nodes_C = random.sample(seeds_C, budget_alloc[2])
-    activated_nodes = []
-    print("Starting nodes ", starting_nodes_A, starting_nodes_B, starting_nodes_C)
+    # print("Starting nodes ", starting_nodes_A, starting_nodes_B, starting_nodes_C)
 
     activated_nodes = []  # will contain all activated nodes
 
@@ -59,18 +58,17 @@ for budget_alloc in budget_alloc_vect:  # for every possible budget allocation
     ret = q5_tools.list_activated_nodes(starting_nodes_C, budget_alloc[2], 'C', edges_info[1], nodes_info[1])
     if ret: activated_nodes.extend(ret)
 
-    print(activated_nodes)
+    # print(activated_nodes)
     activated_nodes = q5_tools.convert_nodes(activated_nodes)  # convert from SN node class to Oracle node class
     activated_nodes.extend(nodes_d)  # add nodes D
 
     # compute matching value for current activated nodes
     bip_graph_edges = bip.Make_Bipartite(activated_nodes)
-    bip_graph_edges.calculate_probability()
-    bip_graph_edges.make_bipartite()
+    bip_graph_edges.make_bipartite_q5()
     matching_value = matching.Matching(bip_graph_edges.list_of_edges).weight_of_matched_list()
 
     if max_value < matching_value:  # select best budget
         best_budget = budget_alloc
-        max_value=matching_value
+        max_value = matching_value
 
 print("Best budget is: ", best_budget)

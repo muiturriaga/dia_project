@@ -60,14 +60,20 @@ class Feature:
                 }
 
 class Node:
-    def __init__(self, num):
+    def __init__(self, num, special_feature=None, features=None):
         self.id = num
         self.activated = False # useful for spreading messages
         self.has_share = False # useful for spreading messages
         self.total_neighbor_activated_cascade = 0
         self.activated_by_same_type = False
-        self.special_feature = np.random.choice(['A', 'B', 'C'], 1, p=[0.33, 0.33, 0.34])[0] #[0] to have the feature equal to a str "A", not =["A"] ##faster and lighter
-        self.features: dict = self.create_features(num)
+        if not special_feature:
+            self.special_feature = np.random.choice(['A', 'B', 'C'], 1, p=[0.33, 0.33, 0.34])[0] #[0] to have the feature equal to a str "A", not =["A"] ##faster and lighter
+        else:
+            self.special_feature = special_feature
+        if not features:
+            self.features: dict = self.create_features(num)
+        else:
+            self.features = features
 
     def create_features(self, node_number):
         np.random.seed(node_number)

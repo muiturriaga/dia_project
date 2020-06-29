@@ -114,7 +114,7 @@ def budget_allocation(discretized_vector, cum_budget):
     perm_list = list(itertools.filterfalse(lambda x: x[0] + x[1] > cum_budget, perm_list))
 
     for tuple in perm_list:
-        budget_list.append([tuple[0], tuple[1], cum_budget-abs(tuple[0]-tuple[1])])  # adds C = A - B
+        budget_list.append([tuple[0], tuple[1], cum_budget-(tuple[0]+tuple[1])])  # adds C = A - B
 
     return budget_list
 
@@ -123,7 +123,7 @@ def convert_nodes(list_sn_nodes):
 
     list_bip_nodes = []
     for node in list_sn_nodes:
-        list_bip_nodes.append(oracle.Nodes(node.id, node.special_feature))
+        list_bip_nodes.append(oracle.Nodes(node.id, node.special_feature, node.features))
 
     return list_bip_nodes
 

@@ -6,6 +6,11 @@ path2add = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file_
 sys.path.append(path2add)
 import oracle
 
+# to import social_network
+path2add = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, 'social_network')))
+sys.path.append(path2add)
+import sn
+
 class Make_Bipartite:
     def __init__(self, list_of_node):
         self.list_of_node = list_of_node
@@ -50,7 +55,7 @@ class Make_Bipartite:
                     if self.p != []:
                         edge_prob = self.p[i-1, j-1]
                     else:
-                        edge_prob = p;
+                        edge_prob = p
                     weight = prob_bernouli * edge_prob
 
                 self.flag = 1
@@ -60,6 +65,40 @@ class Make_Bipartite:
                 self.list_of_edges = list_edges
         return list_edges
 
+    # used in question 5 (instead of bernoulli prob, uses similarity measure)
+    def make_bipartite_q5(self):
+        list_edges = []
+        i = 0
+        edge_num = 0
+
+        for node_r in self.set_right_nodes:
+            i += 1
+            j = 0
+            node_r_sn = sn.Node(node_r.num, node_r.node_type, node_r.features)  # create counterpart of type sn.Node
+
+            for node_l in self.set_left_nodes:
+                j += 1
+                node_l_sn = sn.Node(node_l.num, node_l.node_type, node_l.features)  # create counterpart of type sn.Node
+
+                constant = 0
+                if node_l.node_type == 'A' and node_r.node_type == 'C':
+                    constant = 0.30
+                elif node_l.node_type == 'A' and node_r.node_type == 'D':
+                    constant = 0.34
+                elif node_l.node_type == 'B' and node_r.node_type == 'C':
+                    constant = 0.29
+                elif node_l.node_type == 'B' and node_r.node_type == 'D':
+                    constant = 0.26
+
+                edge_sn = sn.Edge(node_r_sn, node_l_sn)  # create counterpart of type sn.Edge
+                weight = constant * edge_sn.measure_similarity_distance()  # use sn.Edge to compute measure similarity
+
+                list_edges.append(
+                    oracle.Edges(Node_1=node_l, Node_2=node_r, weight_prob=weight, i=edge_num, constant=constant))
+                edge_num += 1
+                self.list_of_edges = list_edges
+
+        return list_edges
 
     def calculate_probability(self):
         cross_over = len(self.set_right_nodes) * len(self.set_left_nodes)
