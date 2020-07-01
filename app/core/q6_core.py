@@ -5,15 +5,16 @@ import sys, os
 path2add = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, 'tools')))
 sys.path.append(path2add)
 import q5.q5_tools as q5_tools
+import q6.q6_tools as q6_tools
 import social_network.sn as sn
-import q5.sn_environment as sn_env
+import q6.sn_environment as sn_env
 import q5.gpts_learner as learner
 
 # MAIN PARAMETERS
 cum_budget = 10
 n_nodes = 100
 num_nodes_d = 30
-T = 1000  # iterations for ts
+T = 100  # iterations for ts
 
 # create social network and list of D nodes
 edges_info, nodes_info, color_map = sn.create_sn(n_nodes)
@@ -34,11 +35,12 @@ budget_alloc_vect = q5_tools.budget_allocation(discretized_vector, cum_budget)
 print("budget alloc vector: ", budget_alloc_vect)
 
 # compute elite nodes with max budget, from which we will choose starting nodes for observing influence spreading
-seeds_a = q5_tools.select_seeds(cum_budget, n_nodes, edges_info[1], nodes_info[1], message="A")
+# activation probabilities are unknown and estimated with UCB
+seeds_a = q6_tools.select_seeds(cum_budget, n_nodes, edges_info, nodes_info, message="A")
 print("seeds a: ", seeds_a)
-seeds_b = q5_tools.select_seeds(cum_budget, n_nodes, edges_info[1], nodes_info[1], message="B")
+seeds_b = q6_tools.select_seeds(cum_budget, n_nodes, edges_info, nodes_info, message="B")
 print("seeds b: ", seeds_b)
-seeds_c = q5_tools.select_seeds(cum_budget, n_nodes, edges_info[1], nodes_info[1], message="C")
+seeds_c = q6_tools.select_seeds(cum_budget, n_nodes, edges_info, nodes_info, message="C")
 print("seeds c: ", seeds_c)
 
 # create social network learning environment
