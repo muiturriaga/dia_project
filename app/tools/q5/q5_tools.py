@@ -1,9 +1,7 @@
 import math
-import sys, os
-import networkx as nx
-import matplotlib.pyplot as plt
+import sys
+import os
 import numpy as np
-import random
 import itertools
 
 # to import social netowrk
@@ -21,7 +19,7 @@ path2add = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file_
 sys.path.append(path2add)
 import oracle
 
-"Return list of activated nodes from starting nodes. If starting node is empty, randomize them"
+# Return list of activated nodes from starting nodes. If starting node is empty, randomize them
 def list_activated_nodes(starting_nodes, budget_specific, message, edges_info_1, nodes_info_1):
 
     if budget_specific == 0:
@@ -47,7 +45,7 @@ def list_activated_nodes(starting_nodes, budget_specific, message, edges_info_1,
 
     return activated_nodes
 
-"Return best seeds given the budget"
+# Return best seeds given the budget
 def select_seeds(budget, n_nodes, edges_info_1, nodes_info_1, message = False):
 
     dataset = []
