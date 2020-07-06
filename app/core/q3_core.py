@@ -20,7 +20,7 @@ import social_network.sn as sn
 
 #  MAIN PARAMETER
 n_nodes = 100
-budget = 100
+budget = 10
 T = 1000
 n_episodes = 10
 bool_track = False
