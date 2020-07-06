@@ -41,13 +41,13 @@ class Make_Bipartite:
                 constant = 0
                 # AC = 0.4 AD = 0.2 BC = 0.3 BD = 0.1
                 if node_l.node_type == 'A' and node_r.node_type == 'C':
-                    constant = 0.35
+                    constant = 0.4
                 elif node_l.node_type == 'A' and node_r.node_type == 'D':
-                    constant = 0.32
+                    constant = 0.18
                 elif node_l.node_type == 'B' and node_r.node_type == 'C':
-                    constant = 0.28
+                    constant = 0.32
                 elif node_l.node_type == 'B' and node_r.node_type == 'D':
-                    constant = 0.25
+                    constant = 0.1
                 if self.flag == 0:
                     weight = prob_bernouli * constant
                 else:
@@ -82,16 +82,16 @@ class Make_Bipartite:
 
                 constant = 0
                 if node_l.node_type == 'A' and node_r.node_type == 'C':
-                    constant = 0.30
+                    constant = 0.4
                 elif node_l.node_type == 'A' and node_r.node_type == 'D':
-                    constant = 0.34
+                    constant = 0.18
                 elif node_l.node_type == 'B' and node_r.node_type == 'C':
-                    constant = 0.29
+                    constant = 0.32
                 elif node_l.node_type == 'B' and node_r.node_type == 'D':
-                    constant = 0.26
+                    constant = 0.1
 
                 edge_sn = sn.Edge(node_r_sn, node_l_sn)  # create counterpart of type sn.Edge
-                weight = constant * edge_sn.measure_similarity_distance()  # use sn.Edge to compute measure similarity
+                weight = constant * np.random.binomial(1, edge_sn.measure_similarity_distance(), 1)  # use sn.Edge to compute measure similarity
 
                 list_edges.append(
                     oracle.Edges(Node_1=node_l, Node_2=node_r, weight_prob=weight, i=edge_num, constant=constant))
