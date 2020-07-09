@@ -6,9 +6,10 @@ import random
 
 
 class Nodes:
-    def __init__(self, num, node_type):
+    def __init__(self, num, node_type, features=None):
         self.num = num
         self.node_type = node_type
+        self.features = features
 
 
 class Edges:
@@ -18,6 +19,7 @@ class Edges:
         self.nodes = [Node_1.num, Node_2.num]
         self.constant = constant
         self.i = i
+
 
 class Matching:
     def __init__(self, list_of_edges):
@@ -42,27 +44,14 @@ class Matching:
                     0]):
                     self.matched_list.append(nodes)
 
-
     def weight_list_of_matched_list(self):
         weight = []
         for edge in self.matched_list:
-            weight .append( edge.weight)
+            weight.append(edge.weight)
         return weight
 
     def weight_of_matched_list(self):
-       weight = 0
-       for edge in self.matched_list:
-           weight += edge.weight
-       return weight
-
-   # def weight_list_of_matched_list(self):
-    #    weight_list = []
-     #   for edge in self.matched_list:
-      #      weight_list.append(edge.weight)
-       # return weight_list
-
-# class Matching_Optimal(Matching):
-#     def __init__(self, list_of_edge):
-#         self.list_of_edge = list_of_edge
-
-    # self.matching()
+        weight = 0
+        for edge in self.matched_list:
+            weight += edge.weight
+        return weight
