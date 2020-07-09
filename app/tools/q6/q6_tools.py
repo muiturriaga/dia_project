@@ -36,8 +36,9 @@ def select_seeds(budget, n_nodes, edges_info, nodes_info, message):
                                                 nodes_info[1])  # rewards of just the nodes pulled
         lin_social_ucb_learner.update(pulled_super_arm, list_reward)
 
-    # Save the rewards of each experiments. So it is composed of n_experiments*T numbers. We are basically doing a mean on experiments in order to have the average number of rewards at each step.
-    # "If" added in construction to avoid dividing by zero (if an arm has not been pulled)
+    # Save the rewards of each experiments. So it is composed of n_experiments*T numbers. We are basically doing a
+    # mean on experiments in order to have the average number of rewards at each step. "If" added in construction to
+    # avoid dividing by zero (if an arm has not been pulled)
     list_average_reward = [
         round(lin_social_ucb_learner.collected_rewards_arms[i] / (lin_social_ucb_learner.nbr_calls_arms[i]), 5) if
         lin_social_ucb_learner.nbr_calls_arms[i] != 0 else 0 for i in range(0, n_nodes)]
@@ -50,3 +51,5 @@ def select_seeds(budget, n_nodes, edges_info, nodes_info, message):
     return np.argsort(list_average_reward)[::-1][0:budget]
 
 
+def estimating_weight(list_of_nodes):
+    return estimated_probs

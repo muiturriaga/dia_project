@@ -45,6 +45,7 @@ normalizing_factor = {"gender": k1,
                       "location": k2
                       }
 
+
 class Feature:
     def __init__(self, gender, age, interests, location):
         self.gender = gender
@@ -59,15 +60,17 @@ class Feature:
                 "location": self.location
                 }
 
+
 class Node:
     def __init__(self, num, special_feature=None, features=None):
         self.id = num
-        self.activated = False # useful for spreading messages
-        self.has_share = False # useful for spreading messages
+        self.activated = False  # useful for spreading messages
+        self.has_share = False  # useful for spreading messages
         self.total_neighbor_activated_cascade = 0
         self.activated_by_same_type = False
         if not special_feature:
-            self.special_feature = np.random.choice(['A', 'B', 'C'], 1, p=[0.33, 0.33, 0.34])[0] #[0] to have the feature equal to a str "A", not =["A"] ##faster and lighter
+            self.special_feature = np.random.choice(['A', 'B', 'C'], 1, p=[0.33, 0.33, 0.34])[
+                0]  # [0] to have the feature equal to a str "A", not =["A"] ##faster and lighter
         else:
             self.special_feature = special_feature
         if not features:
@@ -94,6 +97,7 @@ class Node:
         selected_features: Feature = Feature(gender.tolist(), age.tolist(), interests.tolist(), location.tolist())
         return selected_features.features_dictionary()
 
+
 class Edge:
     def __init__(self, Node_1: Node, Node_2: Node):
         self.head = Node_1.id
@@ -101,9 +105,10 @@ class Edge:
 
         self.feature_distance = self.calculate_features_distance(Node_1, Node_2)
         self.similarity_distance = self.measure_similarity_distance()
-        self.theta = np.random.dirichlet(np.ones(len(self.feature_distance)), size=1).tolist() #tolist() to avoid numpy.ndarray
+        self.theta = np.random.dirichlet(np.ones(len(self.feature_distance)),
+                                         size=1).tolist()  # tolist() to avoid numpy.ndarray
         # probability of activation based on the similarity_distance
-        self.proba_activation = math.exp(-self.similarity_distance**2)
+        self.proba_activation = math.exp(-self.similarity_distance ** 2)
 
     def calculate_features_distance(self, node1, node2):
         features_distance = {}
@@ -119,12 +124,13 @@ class Edge:
         fe = 0
         for key, value in normalizing_factor.items():
             if key == "interests":
-                fe += value*(1 - self.feature_distance[key]/7)
+                fe += value * (1 - self.feature_distance[key] / 7)
             else:
-                fe += value*(1 - self.feature_distance[key])
+                fe += value * (1 - self.feature_distance[key])
         fe += noise
         # fe is equal to 1 in the perfect case where nodes are perfectly the same. In the other dual case, fe is equal to 0.
         return float(fe)
+
 
 # Create Social Network graph
 # Return: edges_info -> edges_info[0] = set of edges in the form of node.id pair (i,j)
@@ -133,7 +139,7 @@ class Edge:
 #                       nodes_info[1] = list of objects Node
 #         color_map -> array of color for each nodes, positional using node.id, A=red, B=blue, C=yellow
 def create_sn(n_nodes):
-    threshold = np.log(n_nodes)/(2*n_nodes)
+    threshold = np.log(n_nodes) / (2 * n_nodes)
     color_map = [''] * n_nodes
 
     # Initialisation of nodes.
@@ -165,6 +171,7 @@ def create_sn(n_nodes):
     nodes_info = [set_nodes, list_nodes]
 
     return edges_info, nodes_info, color_map
+
 
 # Draw social network graph
 # edges_info = set of edges returned by create_sn, in the form of (i,j)
