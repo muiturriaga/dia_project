@@ -6,10 +6,10 @@ import random
 
 
 class Nodes:
-    def __init__(self, num, node_type, features=None):
+    def __init__(self, num, node_type):
         self.num = num
         self.node_type = node_type
-        self.features = features
+
 
 class Edges:
 
