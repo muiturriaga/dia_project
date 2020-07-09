@@ -19,9 +19,9 @@ import bipartite.make_bipartite as m_b
 
 n_of_nodes = 100
 
-T = 50
+T = 20
 
-n_experiments = 200
+n_experiments = 20
 
 reward_per_experiment = []
 
@@ -44,7 +44,7 @@ for i in range(n_of_nodes):
 # one time this information is given. obviously we hav ematrix P stroed. then the algorithm's aim is to learn these probs.
 # I just wrote this to say that we have to add a P variable to our matching algorithm. In
 # other cases we set P as zero. but for the first time we have to take this P into considerations.
-flag = 0
+
 mu_bar_stored = np.ones(34*66)
 
 prob = m_b.Make_Bipartite(list_nodes)
