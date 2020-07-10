@@ -3,6 +3,7 @@ import sys
 import os
 import numpy as np
 import itertools
+from matplotlib import pyplot as plt
 
 # to import social netowrk
 path2add = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, 'social_network')))
@@ -137,3 +138,18 @@ def create_d_nodes(num_nodes_d, n_nodes):
         list_nodes_d.append(oracle.Nodes(n_nodes + i, 'D'))
 
     return list_nodes_d
+
+
+# print Gaussian Process
+def print_gp(means, sigmas, x_len):
+    plt.figure()
+    plt.xlabel('Budget allocations')
+    plt.ylabel('Value of matching')
+    plt.plot(means, '.r', label='Prediction')
+    plt.fill_between(np.linspace(0, x_len, num=x_len, endpoint=False),
+                     means - 1.96 * sigmas,
+                     means + 1.96 * sigmas,
+                     color='blue', alpha=0.3, label='95% confidence interval')
+    plt.legend(loc='upper left')
+    plt.show()
+

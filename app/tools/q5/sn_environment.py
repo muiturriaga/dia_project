@@ -23,7 +23,7 @@ class SnEnvironment:
         starting_nodes_a = random.sample(self.seeds_A, budget_alloc[0])
         starting_nodes_b = random.sample(self.seeds_B, budget_alloc[1])
         starting_nodes_c = random.sample(self.seeds_C, budget_alloc[2])
-        # print("Starting nodes ", starting_nodes_A, starting_nodes_B, starting_nodes_C)
+        # print("Starting nodes ", starting_nodes_a, starting_nodes_b, starting_nodes_c)
 
         activated_nodes = []  # will contain all activated nodes
 

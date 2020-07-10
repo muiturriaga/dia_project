@@ -14,7 +14,7 @@ import q5.gpts_learner as learner
 cum_budget = 10
 n_nodes = 50
 num_nodes_d = 17
-T = 30  # iterations for ts
+T = 50  # iterations for ts
 
 # create social network and list of D nodes
 edges_info, nodes_info, color_map = sn.create_sn(n_nodes)
@@ -56,6 +56,11 @@ for t in range(0, T):
     print("reward: ", reward)
     gpts_learner.update(pulled_arm, reward)
     print("means vector: ", gpts_learner.means)
+
+    if (t % (T/5)) == 0:
+        q5_tools.print_gp(means=gpts_learner.means, sigmas=gpts_learner.sigmas, x_len=len(budget_alloc_vect))
+
+q5_tools.print_gp(means=gpts_learner.means, sigmas=gpts_learner.sigmas, x_len=len(budget_alloc_vect))
 
 max_budget_idx = np.argmax(gpts_learner.means)
 

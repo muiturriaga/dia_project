@@ -58,8 +58,6 @@ def estimating_weight(list_of_nodes, T):
 
     env = cmab.CMAB_Environment(list_of_edges)
 
-    #for e in range(0, n_experiments):
-
     cmab_learner = learner.Learner(list_of_edges, env.Ti, env.mu_bar)
 
     for t in range(0, T):
