@@ -49,10 +49,13 @@ gpts_learner = learner.GptsLearner(n_arms=len(budget_alloc_vect))
 # main loop, each step, pull arm, compute reward, fit gp regression
 for t in range(0, T):
     pulled_arm = gpts_learner.pull_arm()  # returns index
+    print("arm pulled: ", pulled_arm)
     reward = env.round(budget_alloc_vect[pulled_arm])
+    print("reward: ", reward)
     gpts_learner.update(pulled_arm, reward)
+    print("means vector: ", gpts_learner.means)
 
 max_budget_idx = np.argmax(gpts_learner.means)
 
-print("best budget is: ", budget_alloc_vect[max_budget_idx], "with value: ", gpts_learner.means[max_budget_idx])
+print("Best budget is: ", budget_alloc_vect[max_budget_idx], "with value: ", gpts_learner.means[max_budget_idx])
 

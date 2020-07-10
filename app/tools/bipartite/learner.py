@@ -55,7 +55,6 @@ class Learner:
             ### try this s ignoring when the an arm is not in matching (just consider those in the matching)
             if is_question6:
                 self.mu_hat[arms.i] = (arms.weight + ((self.s[arms.i] - 1) * self.mu_hat[arms.i])) / self.s[arms.i]
-                print("you are in q6 be careful")
             else:
                 self.mu_hat[arms.i] = (arms.constant + ((self.s[arms.i] - 1) * self.mu_hat[arms.i])) / self.s[
                 arms.i]  ### he

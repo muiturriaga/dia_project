@@ -12,7 +12,7 @@ import bipartite.learner as learner
 import bipartite.make_bipartite as m_b
 
 n_episodes = 10
-T = 1000
+T_seeds = 1000
 bool_track = False
 
 
@@ -31,7 +31,7 @@ def select_seeds(budget, n_nodes, edges_info, nodes_info, message):
     np.seterr(over='raise')
     lin_social_ucb_learner = learners.SocialUCBLearner(arms_features=arms_features, budget=budget)
 
-    for t in range(0, T):
+    for t in range(0, T_seeds):
         pulled_super_arm = lin_social_ucb_learner.pull_super_arm()  # idx of pulled arms
         list_reward = q3_tools.calculate_reward(pulled_super_arm, env,
                                                 nodes_info[1])  # rewards of just the nodes pulled
@@ -52,26 +52,26 @@ def select_seeds(budget, n_nodes, edges_info, nodes_info, message):
     return np.argsort(list_average_reward)[::-1][0:budget].tolist()
 
 
-def estimating_weight(list_of_nodes, n_experiments, T):
+def estimating_weight(list_of_nodes, T):
     prob = m_b.Make_Bipartite(list_of_nodes)
     list_of_edges = prob.make_bipartite_q5()
 
     env = cmab.CMAB_Environment(list_of_edges)
 
-    for e in range(0, n_experiments):
+    #for e in range(0, n_experiments):
 
-        cmab_learner = learner.Learner(list_of_edges, env.Ti, env.mu_bar)
+    cmab_learner = learner.Learner(list_of_edges, env.Ti, env.mu_bar)
 
-        for t in range(0, T):
-            cmab_learner.t_total = t + 1
-            pulled_super_arm = cmab_learner.pull_super_arm()
-            results = env.round(pulled_super_arm)
+    for t in range(0, T):
+        cmab_learner.t_total = t + 1
+        pulled_super_arm = cmab_learner.pull_super_arm()
+        results = env.round(pulled_super_arm)
 
-            cmab_learner.update(results, True)  # when do we use cmab_learner.pull_super_arm
-            prob.set_p(env.mu_bar)
-            list_of_edges = prob.make_bipartite_q5()
-            env.list_of_all_arms = list_of_edges
+        cmab_learner.update(results, True)  # when do we use cmab_learner.pull_super_arm
+        prob.set_p(env.mu_bar)
+        list_of_edges = prob.make_bipartite_q5()
+        env.list_of_all_arms = list_of_edges
 
-            results.weight_of_matched_list()
+        results.weight_of_matched_list()
 
     return env.matching_result.weight_of_matched_list()

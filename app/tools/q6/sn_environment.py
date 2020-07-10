@@ -11,12 +11,7 @@ import q6.q6_tools as q6_tools
 
 
 def matching_value(activated_nodes):
-    return q6_tools.estimating_weight(activated_nodes, 20, 20)
-    # COPY CODE HERE
-    # activated nodes is a list of oracle nodes
-    # q4_core -> instead of bernoulli(p) at the start -> have bernoulli(similarity_measure)
-    #            in the end, with estimated prob, compute value of matching
-
+    return q6_tools.estimating_weight(activated_nodes, 20)
 
 class SnEnvironment:
     def __init__(self, seeds_a, seeds_b, seeds_c, nodes_d, nodes_info, edges_info):
@@ -48,5 +43,6 @@ class SnEnvironment:
 
         activated_nodes = q5_tools.convert_nodes(activated_nodes)  # convert from SN node class to Oracle node class
         activated_nodes.extend(self.nodes_d)  # add nodes D
+
         return matching_value(activated_nodes)
 

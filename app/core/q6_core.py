@@ -12,9 +12,9 @@ import q5.gpts_learner as learner
 
 # MAIN PARAMETERS
 cum_budget = 10
-n_nodes = 10
-num_nodes_d = 30
-T = 10  # iterations for ts
+n_nodes = 50
+num_nodes_d = 17
+T = 30  # iterations for ts
 
 # create social network and list of D nodes
 edges_info, nodes_info, color_map = sn.create_sn(n_nodes)
@@ -51,10 +51,13 @@ gpts_learner = learner.GptsLearner(n_arms=len(budget_alloc_vect))
 # main loop, each step, pull arm, compute reward, fit gp regression
 for t in range(0, T):
     pulled_arm = gpts_learner.pull_arm()  # returns index
+    print("arm pulled: ", pulled_arm)
     reward = env.round(budget_alloc_vect[pulled_arm])
+    print("reward: ", reward)
     gpts_learner.update(pulled_arm, reward)
+    print("means vector: ", gpts_learner.means)
 
 max_budget_idx = np.argmax(gpts_learner.means)
 
-print("best budget is: ", budget_alloc_vect[max_budget_idx], "with value: ", gpts_learner.means[max_budget_idx])
+print("Best budget is: ", budget_alloc_vect[max_budget_idx], "with value: ", gpts_learner.means[max_budget_idx])
 
