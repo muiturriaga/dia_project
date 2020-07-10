@@ -74,7 +74,7 @@ for e in range(0, n_experiments):
         pulled_super_arm = cmab_learner.pull_super_arm()
         results = env.round(pulled_super_arm)
 
-        cmab_learner.update(results)# when do we use cmab_learner.pull_super_arm
+        cmab_learner.update(results, False)# when do we use cmab_learner.pull_super_arm
         opt_per_experiment.append(env.opt())
         prob.set_p(env.mu_bar)
         list_of_edges = prob.make_bipartite()

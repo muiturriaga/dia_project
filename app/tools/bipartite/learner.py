@@ -25,7 +25,7 @@ class Learner:
         # selected_list_indicies2 = sorted(range(len(self.ucbs)), key=lambda i: self.ucbs[i], reverse=True)[:500]
         selected_list_indicies_sorted = np.argsort(self.mu_bar)[::-1]
 
-        for index in range(600):
+        for index in range(min(len(self.list_of_arms), 600)):
             ### is this for the first time overal, or each first time a learern is created?
             if self.it_is_first_time:
                 random.shuffle(self.list_of_arms)
@@ -48,12 +48,16 @@ class Learner:
 
     #         #self.mu_hat[arm.i]=arm.weight
 
-    def update_estimation(self, results):
+    def update_estimation(self, results, is_question6):
         result_of_played_arm = results
         for arms in result_of_played_arm.matched_list:
             self.s[arms.i] += 1
             ### try this s ignoring when the an arm is not in matching (just consider those in the matching)
-            self.mu_hat[arms.i] = (arms.constant + ((self.s[arms.i] - 1) * self.mu_hat[arms.i])) / self.s[
+            if is_question6:
+                self.mu_hat[arms.i] = (arms.weight + ((self.s[arms.i] - 1) * self.mu_hat[arms.i])) / self.s[arms.i]
+                print("you are in q6 be careful")
+            else:
+                self.mu_hat[arms.i] = (arms.constant + ((self.s[arms.i] - 1) * self.mu_hat[arms.i])) / self.s[
                 arms.i]  ### he
             #  self.mu_hat[arm.i]=(arm.constant + self.mu_hat[arm.i])/2
             adjustment_term = np.sqrt(3 * np.log(self.t_total) / (2 * (self.Ti[arms.i]) + 0.0001))
@@ -61,12 +65,12 @@ class Learner:
             self.mu_bar[arms.i] = self.mu_hat[arms.i] + adjustment_term
             self.mu_bar[arms.i] = min(self.mu_bar[arms.i], 1)  # clipping the mean value to 1
 
-    def update(self, results):
+    def update(self, results, is_question6):
         self.t += 1
         result_of_played_arms = results
         reward_of_matching_list = result_of_played_arms.weight_of_matched_list()
         self.collected_rewards.append(reward_of_matching_list)
-        self.update_estimation(results)
+        self.update_estimation(results, is_question6)
         # self.reward_list.append(reward)
         # t is the number of rounds so far,
         # Ti is the number of times an arm (an edge, or a pair of nodes) is activated so far (from the beginning)

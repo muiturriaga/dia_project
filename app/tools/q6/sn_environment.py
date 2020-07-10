@@ -7,10 +7,8 @@ import numpy as np
 path2add = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, 'tools')))
 sys.path.append(path2add)
 import q5.q5_tools as q5_tools
-import bipartite.cmab_env as cmab
-import bipartite.learner as learner
-import bipartite.oracle as oracle
-import bipartite.make_bipartite as m_b
+import q6.q6_tools as q6_tools
+
 
 class SnEnvironment:
     def __init__(self, seeds_a, seeds_b, seeds_c, nodes_d, nodes_info, edges_info):
@@ -42,7 +40,11 @@ class SnEnvironment:
 
         activated_nodes = q5_tools.convert_nodes(activated_nodes)  # convert from SN node class to Oracle node class
         activated_nodes.extend(self.nodes_d)  # add nodes D
+        return self.matching_value(activated_nodes)
 
+    def matching_value(self, activated_nodes):
+        matching_value = q6_tools.estimating_weight(activated_nodes, 20, 20)
+        return matching_value
         # COPY CODE HERE
         # activated nodes is a list of oracle nodes
         # q4_core -> instead of bernoulli(p) at the start -> have bernoulli(similarity_measure)

@@ -7,6 +7,9 @@ path2add = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file_
 sys.path.append(path2add)
 import q3.q3_tools as q3_tools
 import q3.q3_learners as learners
+import bipartite.cmab_env as cmab
+import bipartite.learner as learner
+import bipartite.make_bipartite as m_b
 
 n_episodes = 10
 T = 1000
@@ -15,9 +18,7 @@ bool_track = False
 
 # Return best seeds given the budget. Activation probabilities are estimated with UCB approach
 def select_seeds(budget, n_nodes, edges_info, nodes_info, message):
-    lin_social_ucb_rewards_per_experiment = []
-    list_best_super_arms_per_experiment = []
-    list_best_rewards_per_experiment = []
+
     arms_features = q3_tools.get_list_features(nodes_info[1], dim=19)
 
     list_proba_edges = []
@@ -48,8 +49,29 @@ def select_seeds(budget, n_nodes, edges_info, nodes_info, message):
     #        if math.isnan(List_average_reward[i]) == True:
     #            List_average_reward[i] = 0
 
-    return np.argsort(list_average_reward)[::-1][0:budget]
+    return np.argsort(list_average_reward)[::-1][0:budget].tolist()
 
 
-def estimating_weight(list_of_nodes):
-    return estimated_probs
+def estimating_weight(list_of_nodes, n_experiments, T):
+    prob = m_b.Make_Bipartite(list_of_nodes)
+    list_of_edges = prob.make_bipartite_q5()
+
+    env = cmab.CMAB_Environment(list_of_edges)
+
+    for e in range(0, n_experiments):
+
+        cmab_learner = learner.Learner(list_of_edges, env.Ti, env.mu_bar)
+
+        for t in range(0, T):
+            cmab_learner.t_total = t + 1
+            pulled_super_arm = cmab_learner.pull_super_arm()
+            results = env.round(pulled_super_arm)
+
+            cmab_learner.update(results, True)  # when do we use cmab_learner.pull_super_arm
+            prob.set_p(env.mu_bar)
+            list_of_edges = prob.make_bipartite_q5()
+            env.list_of_all_arms = list_of_edges
+
+            results.weight_of_matched_list()
+
+    return env.matching_result.weight_of_matched_list()

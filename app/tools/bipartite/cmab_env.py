@@ -7,6 +7,7 @@ path2add = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file_
 sys.path.append(path2add)
 import oracle
 
+
 class CMAB_Environment:
     def __init__(self, list_of_all_arms):
         self.list_of_all_arms = list_of_all_arms
@@ -15,7 +16,6 @@ class CMAB_Environment:
         self.Si = np.zeros(len(list_of_all_arms))
         self.matching_result = []
         self.mu_bar = np.ones(len(list_of_all_arms))
-
 
     def round(self, super_arm_to_pull):
         # in each round, a set of arms (called a super arm) are played together. (page 2 of the article)
@@ -30,10 +30,7 @@ class CMAB_Environment:
         return self.matching_result
 
     def opt(self):
-        opt_mean = ((0.35 * 35 * 25) + (0.32 * 35 * 15) + (0.28 * 25 * 25) + (0.25 * 25 * 15)) / (61 * 39)
-        opt_value=0
+        opt_value = 0
         for arms in self.matching_result.matched_list:
-            opt_value=opt_value+self.mu_bar[arms.i]
-        #return np.mean(self.mu_bar) * len(self.matching_result.matched_list)
-        # return np.mean(self.mu_bar) * len(self.matching_result.matched_list)
+            opt_value = opt_value + self.mu_bar[arms.i]
         return opt_value

@@ -12,9 +12,9 @@ import q5.gpts_learner as learner
 
 # MAIN PARAMETERS
 cum_budget = 10
-n_nodes = 100
+n_nodes = 10
 num_nodes_d = 30
-T = 100  # iterations for ts
+T = 10  # iterations for ts
 
 # create social network and list of D nodes
 edges_info, nodes_info, color_map = sn.create_sn(n_nodes)
