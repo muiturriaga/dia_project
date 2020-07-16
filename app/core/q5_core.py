@@ -1,6 +1,6 @@
 import numpy as np
 import sys, os
-import random
+import time
 
 # to import tools
 path2add = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, 'tools')))
@@ -36,6 +36,9 @@ best_budget = []
 budget_alloc_vect = q5_tools.budget_allocation(discretized_vector, cum_budget)
 print("budget alloc vector: ", budget_alloc_vect)
 
+# time for comparing purpose
+start_time = time.time()
+
 # compute elite nodes with max budget, from which we will choose starting nodes for observing influence spreading
 seeds_a = q5_tools.select_seeds(cum_budget, n_nodes, edges_info[1], nodes_info[1], message="A")
 print("seeds a: ", seeds_a)
@@ -65,27 +68,44 @@ q5_tools.print_gp(means=gpts_learner.means, sigmas=gpts_learner.sigmas, x_len=le
 
 max_budget_idx = np.argmax(gpts_learner.means)
 
-print("Best budget is: ", budget_alloc_vect[max_budget_idx], "with value: ", gpts_learner.means[max_budget_idx])
+# time for comparing purpose
+end_time = time.time()
 
-# for comparison, we are doing here a naive version
+print("Best budget by GPTS: ", budget_alloc_vect[max_budget_idx], "with value: ", gpts_learner.means[max_budget_idx])
+print("Time used by GPTS: ", end_time-start_time)
+
+
+# time for comparing purpose
+start_time = time.time()
+
+# for comparison, we are doing here a naive version where we apply at each round MC estimation
 max_value = 0
 best_budget = []
+starting_nodes_a = []
+starting_nodes_b = []
+starting_nodes_c = []
 
 for budget_alloc in budget_alloc_vect:
-    starting_nodes_a = random.sample(seeds_a, budget_alloc[0])
-    starting_nodes_b = random.sample(seeds_b, budget_alloc[1])
-    starting_nodes_c = random.sample(seeds_c, budget_alloc[2])
+    if budget_alloc[0] > 0:
+        starting_nodes_a = q5_tools.select_seeds(budget_alloc[0], n_nodes, edges_info[1], nodes_info[1], message="A")
+    if budget_alloc[1] > 0:
+        starting_nodes_b = q5_tools.select_seeds(budget_alloc[1], n_nodes, edges_info[1], nodes_info[1], message="B")
+    if budget_alloc[2] > 0:
+        starting_nodes_c = q5_tools.select_seeds(budget_alloc[2], n_nodes, edges_info[1], nodes_info[1], message="C")
     # print("Starting nodes ", starting_nodes_a, starting_nodes_b, starting_nodes_c)
 
     activated_nodes = []  # will contain all activated nodes
 
     # observe, given seeds for each type, the activation of nodes in the SN by spreading the message
-    ret = q5_tools.list_activated_nodes(starting_nodes_a, budget_alloc[0], 'A', edges_info[1], nodes_info[1])
-    if ret: activated_nodes.extend(ret)
-    ret = q5_tools.list_activated_nodes(starting_nodes_b, budget_alloc[1], 'B', edges_info[1], nodes_info[1])
-    if ret: activated_nodes.extend(ret)
-    ret = q5_tools.list_activated_nodes(starting_nodes_c, budget_alloc[2], 'C', edges_info[1], nodes_info[1])
-    if ret: activated_nodes.extend(ret)
+    if budget_alloc[0] > 0:
+        ret = q5_tools.list_activated_nodes(starting_nodes_a, budget_alloc[0], 'A', edges_info[1], nodes_info[1])
+        if ret: activated_nodes.extend(ret)
+    if budget_alloc[1] > 0:
+        ret = q5_tools.list_activated_nodes(starting_nodes_b, budget_alloc[1], 'B', edges_info[1], nodes_info[1])
+        if ret: activated_nodes.extend(ret)
+    if budget_alloc[2] > 0:
+        ret = q5_tools.list_activated_nodes(starting_nodes_c, budget_alloc[2], 'C', edges_info[1], nodes_info[1])
+        if ret: activated_nodes.extend(ret)
 
     # print("activated nodes: ", activated_nodes)
     activated_nodes = q5_tools.convert_nodes(activated_nodes)  # convert from SN node class to Oracle node class
@@ -100,5 +120,8 @@ for budget_alloc in budget_alloc_vect:
         max_value = value_matching
         best_budget = budget_alloc
 
-print("Best naive budget is: ", best_budget, "with value: ", max_value.astype(int))
+# time for comparing purpose
+end_time = time.time()
 
+print("Best budget by Naive: ", best_budget, "with value: ", max_value.astype(int))
+print("Time used by naive: ", end_time-start_time)
