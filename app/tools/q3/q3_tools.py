@@ -40,14 +40,14 @@ def credit_nodes(list_A_node_activated, list_edges_activated, pulled_super_arm):
     return list_credit
 
 
-def calculate_reward(pulled_super_arm, env, list_nodes_info):
+def calculate_reward(pulled_super_arm, env, list_nodes_info, budget):
     list_rewards_super_arm = [0] * len(pulled_super_arm)
 
     # Simulate an episode.
     [episode , list_edges_activated]= sn_tools.simulate_episode(init_prob_matrix = env.p, n_steps_max = 100, budget = env.budget, perfect_nodes =  pulled_super_arm)
 
     # We count only nodes activated regardless of their message. If track = True then we assign rewards at a specific node by tracing the root. If track = False we give the same rewards to all the nodes.
-    credits_of_each_node, score_by_seeds_history, nbr_activates = sn_tools.credits_assignment(dataset = [episode], dataset_edges = [list_edges_activated], list_nodes = list_nodes_info, track = env.bool_track)
+    credits_of_each_node, score_by_seeds_history, nbr_activates = sn_tools.credits_assignment(dataset = [episode], dataset_edges = [list_edges_activated], list_nodes = list_nodes_info, track = env.bool_track, budget = budget)
 
     # print(credits_of_each_node, '\n')
 
