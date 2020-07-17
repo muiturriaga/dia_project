@@ -72,4 +72,4 @@ def estimating_weight(list_of_nodes, T):
 
         results.weight_of_matched_list()
 
-    return env.matching_result.weight_of_matched_list()
+    return env.matching_result

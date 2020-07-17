@@ -75,7 +75,7 @@ print("Best budget by GPTS: ", budget_alloc_vect[max_budget_idx], "with value: "
 print("Time used by GPTS: ", end_time-start_time)
 
 
-# time for comparing purpose
+"""# time for comparing purpose
 start_time = time.time()
 
 # for comparison, we are doing here a naive version where we apply at each round MC estimation
@@ -124,4 +124,4 @@ for budget_alloc in budget_alloc_vect:
 end_time = time.time()
 
 print("Best budget by Naive: ", best_budget, "with value: ", max_value.astype(int))
-print("Time used by naive: ", end_time-start_time)
+print("Time used by naive: ", end_time-start_time)"""

@@ -1,5 +1,6 @@
 import numpy as np
 import sys, os
+import matplotlib.pyplot as plt
 
 # to import tools
 path2add = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, 'tools')))
@@ -14,7 +15,8 @@ import q5.gpts_learner as learner
 cum_budget = 10
 n_nodes = 50
 num_nodes_d = 17
-T = 50  # iterations for ts
+T = 30  # iterations for ts
+n_experiments = 50
 
 # create social network and list of D nodes
 edges_info, nodes_info, color_map = sn.create_sn(n_nodes)
@@ -29,6 +31,8 @@ discretized_vector = (scale*np.array([0, 1, 3, 5, 8, 10])).astype(int)  # scale 
 max_value = 0
 matching_value = 0
 best_budget = []
+rewards_per_experiment = []
+gpts_rewards_per_experiment = []
 
 # obtain a vector of all possible budget allocation
 budget_alloc_vect = q5_tools.budget_allocation(discretized_vector, cum_budget)
@@ -45,24 +49,47 @@ print("seeds c: ", seeds_c)
 
 # create social network learning environment
 env = sn_env.SnEnvironment(seeds_a, seeds_b, seeds_c, nodes_d, nodes_info, edges_info)
-# create gaussian process thompson sampling learner
-gpts_learner = learner.GptsLearner(n_arms=len(budget_alloc_vect))
+opt = []
 
-# main loop, each step, pull arm, compute reward, fit gp regression
-for t in range(0, T):
-    pulled_arm = gpts_learner.pull_arm()  # returns index
-    print("arm pulled: ", pulled_arm)
-    reward = env.round(budget_alloc_vect[pulled_arm])
-    print("reward: ", reward)
-    gpts_learner.update(pulled_arm, reward)
-    print("means vector: ", gpts_learner.means)
+for e in range(n_experiments):
+    # create gaussian process thompson sampling learner
+    gpts_learner = learner.GptsLearner(n_arms=len(budget_alloc_vect))
+    opt_per_experiment = []
 
-    if (t % (T/5)) == 0:
+    # main loop, each step, pull arm, compute reward, fit gp regression
+    for t in range(0, T):
+        pulled_arm = gpts_learner.pull_arm()  # returns index
+        print("arm pulled: ", pulled_arm)
+        reward = env.round(budget_alloc_vect[pulled_arm])
+        print("reward: ", reward)
+        gpts_learner.update(pulled_arm, reward)
+        print("means vector: ", gpts_learner.means)
+
+        opt_per_experiment.append(env.opt())
+
+        if (t % (T/5)) == 0 and e == 0:
+            q5_tools.print_gp(means=gpts_learner.means, sigmas=gpts_learner.sigmas, x_len=len(budget_alloc_vect))
+    if e == 0:
         q5_tools.print_gp(means=gpts_learner.means, sigmas=gpts_learner.sigmas, x_len=len(budget_alloc_vect))
 
-q5_tools.print_gp(means=gpts_learner.means, sigmas=gpts_learner.sigmas, x_len=len(budget_alloc_vect))
+    max_budget_idx = np.argmax(gpts_learner.means)
 
-max_budget_idx = np.argmax(gpts_learner.means)
+    print("Best budget is: ", budget_alloc_vect[max_budget_idx], "with value: ", gpts_learner.means[max_budget_idx])
 
-print("Best budget is: ", budget_alloc_vect[max_budget_idx], "with value: ", gpts_learner.means[max_budget_idx])
+    opt.append(opt_per_experiment)
+    gpts_rewards_per_experiment.append(gpts_learner.collected_rewards)
+
+# printing regret
+plt.figure(0)
+plt.xlabel("t")
+plt.ylabel("Regret")
+# opt=env.opt()
+# opt_reward=env.opt()
+ooo = []
+for i in range(n_experiments):
+    ooo.append(np.mean([b - a for a, b in zip(opt[i], gpts_rewards_per_experiment[i])]))
+
+plt.plot(np.cumsum(ooo, axis=0), 'g')
+plt.show()
+
 

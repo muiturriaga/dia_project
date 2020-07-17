@@ -10,9 +10,6 @@ import q5.q5_tools as q5_tools
 import q6.q6_tools as q6_tools
 
 
-def matching_value(activated_nodes):
-    return q6_tools.estimating_weight(activated_nodes, 20)
-
 class SnEnvironment:
     def __init__(self, seeds_a, seeds_b, seeds_c, nodes_d, nodes_info, edges_info):
         self.seeds_A = seeds_a
@@ -21,6 +18,7 @@ class SnEnvironment:
         self.nodes_d = nodes_d
         self.nodes_info = nodes_info
         self.edges_info = edges_info
+        self.matching_result = []
 
     # HAS TO RETURN VALUE OF MATCHING.
     # The problem I see -> at the moment, you create probabilities to estimate.
@@ -44,5 +42,12 @@ class SnEnvironment:
         activated_nodes = q5_tools.convert_nodes(activated_nodes)  # convert from SN node class to Oracle node class
         activated_nodes.extend(self.nodes_d)  # add nodes D
 
-        return matching_value(activated_nodes)
+        self.matching_result = q6_tools.estimating_weight(activated_nodes, 20)
+        return self.matching_result.weight_of_matched_list()
+
+    def opt(self):
+        opt_value = 0
+        for arms in self.matching_result.matched_list:
+            opt_value = opt_value + arms.constant
+        return opt_value
 
