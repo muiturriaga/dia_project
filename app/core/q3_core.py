@@ -22,8 +22,8 @@ import social_network.sn as sn
 #  MAIN PARAMETER
 n_nodes = 100
 budget = 10
-T = 1000
-n_episodes = 20
+n_episodes = 1000
+n_experiments = 100
 bool_track = False
 
 edges_info, nodes_info, color_map = sn.create_sn(n_nodes)
@@ -45,13 +45,13 @@ list_special_features_nodes = [node.special_feature for node in nodes_info[1]]
 env = learners.SocialEnvironment(edges_info[0], list_proba_edges, n_nodes, 'A', budget, bool_track)
 
 np.seterr(over='raise')
-print('The number of episodes is : ', n_episodes)
-for e in range(0, n_episodes):  # N_episodes
+print('The number of episodes is : ', n_experiments)
+for e in range(0, n_experiments):  # n_experiments
     print("Running episode n {}".format(e))
 
     lin_social_ucb_learner = learners.SocialUCBLearner(arms_features=arms_features, budget=budget)
 
-    for t in range(0, T):
+    for t in range(0, n_episodes):
         pulled_super_arm = lin_social_ucb_learner.pull_super_arm()  # idx of pulled arms
         list_reward = q3_tools.calculate_reward(pulled_super_arm, env,
                                                 nodes_info[1], budget)  # rewards of just the nodes pulled
@@ -93,14 +93,14 @@ print(opt2)
 print(rewards)
 
 plt.figure(0)
-plt.title("nodes: {}, experiments: {}, n_episodes x esperiment: {}, ".format(n_nodes, n_episodes, T))
+plt.title("nodes: {}, experiments: {}, n_episodes: {}, ".format(n_nodes, n_experiments, n_episodes))
 plt.ylabel("Regret")
 plt.xlabel("Episodes")
 plt.plot(np.cumsum(opt - mean), 'r')
 plt.legend(["LinUCB"])
 
 #plt.figure(1)
-#plt.title("DO NOT TAKE INTO ACOUNT nodes: {}, time: {}, n_episodes: {}, bool_track: {}".format(n_nodes, T, n_episodes, env.bool_track))
+#plt.title("DO NOT TAKE INTO ACOUNT nodes: {}, time: {}, n_experiments: {}, bool_track: {}".format(n_nodes, T, n_experiments, env.bool_track))
 #plt.ylabel("Regret")
 #plt.xlabel("Episodes")
 #plt.plot(np.cumsum(opt2 - rewards), 'g')
