@@ -93,9 +93,9 @@ print(opt2)
 print(rewards)
 
 plt.figure(0)
-plt.title("nodes: {}, times performed: {}, n_episodes: {}, ".format(n_nodes, n_episodes, T))
+plt.title("nodes: {}, experiments: {}, n_episodes x esperiment: {}, ".format(n_nodes, n_episodes, T))
 plt.ylabel("Regret")
-plt.xlabel("t")
+plt.xlabel("Episodes")
 plt.plot(np.cumsum(opt - mean), 'r')
 plt.legend(["LinUCB"])
 
