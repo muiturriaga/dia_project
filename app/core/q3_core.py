@@ -54,7 +54,7 @@ for e in range(0, n_episodes):  # N_episodes
     for t in range(0, T):
         pulled_super_arm = lin_social_ucb_learner.pull_super_arm()  # idx of pulled arms
         list_reward = q3_tools.calculate_reward(pulled_super_arm, env,
-                                                nodes_info[1])  # rewards of just the nodes pulled
+                                                nodes_info[1], budget)  # rewards of just the nodes pulled
         lin_social_ucb_learner.update(pulled_super_arm, list_reward)
 
     # Save the rewards of each experiments. So it is composed of n_experiments*T numbers. We are basically doing a
@@ -84,12 +84,25 @@ for e in range(0, n_episodes):  # N_episodes
 
 opt = np.mean(np.array([np.mean(np.array(i)) for i in list_best_rewards_per_experiment]), axis=0)
 mean = np.mean(lin_social_ucb_rewards_per_experiment, axis=0)
-print("opt {} mean {} bool {}".format(opt, mean, env.bool_track))
+#print("opt {} mean {} bool {}".format(opt, mean, env.bool_track))
+
+rewards = np.sum(lin_social_ucb_learner.collected_rewards, axis=1)
+opt2 = np.max(rewards)
+
+print(opt2)
+print(rewards)
 
 plt.figure(0)
 plt.title("nodes: {}, time: {}, n_episodes: {}, bool_track: {}".format(n_nodes, T, n_episodes, env.bool_track))
 plt.ylabel("Regret")
 plt.xlabel("t")
 plt.plot(np.cumsum(opt - mean), 'r')
+plt.legend(["LinUCB"])
+
+plt.figure(1)
+plt.title("DO NOT TAKE INTO ACOUNT nodes: {}, time: {}, n_episodes: {}, bool_track: {}".format(n_nodes, T, n_episodes, env.bool_track))
+plt.ylabel("Regret")
+plt.xlabel("Episodes")
+plt.plot(np.cumsum(opt2 - rewards), 'g')
 plt.legend(["LinUCB"])
 plt.show()
