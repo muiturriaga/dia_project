@@ -42,7 +42,7 @@ class SnEnvironment:
         activated_nodes = q5_tools.convert_nodes(activated_nodes)  # convert from SN node class to Oracle node class
         activated_nodes.extend(self.nodes_d)  # add nodes D
 
-        self.matching_result = q6_tools.estimating_weight(activated_nodes, 20)
+        self.matching_result = q6_tools.estimating_weight(activated_nodes, 30)
         return self.matching_result.weight_of_matched_list()
 
     def opt(self):

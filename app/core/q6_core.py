@@ -13,9 +13,9 @@ import q5.gpts_learner as learner
 
 # MAIN PARAMETERS
 cum_budget = 10
-n_nodes = 50
-num_nodes_d = 17
-T = 30  # iterations for ts
+n_nodes = 100
+num_nodes_d = 30
+T = 50  # iterations for ts
 n_experiments = 50
 
 # create social network and list of D nodes
@@ -28,11 +28,10 @@ cum_budget_base = 10
 scale = cum_budget/cum_budget_base
 discretized_vector = (scale*np.array([0, 1, 3, 5, 8, 10])).astype(int)  # scale the discretized base vector accordingly
 
-max_value = 0
-matching_value = 0
-best_budget = []
-rewards_per_experiment = []
 gpts_rewards_per_experiment = []
+max_budget_idx_vect = []    # best budget allocation indexes, 1 per experiment
+max_value_dict = {}         # dictionary of pair (budget allocation index, value of matching)
+opt_dict = {}               # dictionary for optimum (budget allocation index, optimum value of matching)
 
 # obtain a vector of all possible budget allocation
 budget_alloc_vect = q5_tools.budget_allocation(discretized_vector, cum_budget)
@@ -49,12 +48,10 @@ print("seeds c: ", seeds_c)
 
 # create social network learning environment
 env = sn_env.SnEnvironment(seeds_a, seeds_b, seeds_c, nodes_d, nodes_info, edges_info)
-opt = []
 
 for e in range(n_experiments):
     # create gaussian process thompson sampling learner
     gpts_learner = learner.GptsLearner(n_arms=len(budget_alloc_vect))
-    opt_per_experiment = []
 
     # main loop, each step, pull arm, compute reward, fit gp regression
     for t in range(0, T):
@@ -65,31 +62,37 @@ for e in range(n_experiments):
         gpts_learner.update(pulled_arm, reward)
         print("means vector: ", gpts_learner.means)
 
-        opt_per_experiment.append(env.opt())
+        # update dictionary for optimum matching values
+        if not opt_dict.get(pulled_arm):  # if new key, create key-value pair
+            opt_dict[pulled_arm] = env.opt()
+        else:  # else, do max between old and new optimum
+            opt_dict[pulled_arm] = max(env.opt(), opt_dict[pulled_arm])
 
+    # print only one time GPTS confidence intervals
         if (t % (T/5)) == 0 and e == 0:
             q5_tools.print_gp(means=gpts_learner.means, sigmas=gpts_learner.sigmas, x_len=len(budget_alloc_vect))
     if e == 0:
         q5_tools.print_gp(means=gpts_learner.means, sigmas=gpts_learner.sigmas, x_len=len(budget_alloc_vect))
 
-    max_budget_idx = np.argmax(gpts_learner.means)
-
-    print("Best budget is: ", budget_alloc_vect[max_budget_idx], "with value: ", gpts_learner.means[max_budget_idx])
-
-    opt.append(opt_per_experiment)
     gpts_rewards_per_experiment.append(gpts_learner.collected_rewards)
 
+    idx = np.argmax(gpts_learner.means)     # index of budget alloc best for this experiment
+    max_budget_idx_vect.append(idx)         # append index to list of best budget allocation
+    # update dictionary for matching values
+    if not max_value_dict.get(idx):       # if new key, create key-value pair
+        max_value_dict[idx] = gpts_learner.means[idx]
+    else:                               # else, do mean between old and new value
+        max_value_dict[idx] = np.mean([gpts_learner.means[idx], max_value_dict[idx]])
+
+max_budget_idx = max(max_budget_idx_vect, key=max_budget_idx_vect.count)    # count the most frequent index
+print("Best budget is: ", budget_alloc_vect[max_budget_idx], "with value: ", max_value_dict.get(max_budget_idx))
+
 # printing regret
-plt.figure(0)
+opt = opt_dict.get(max_budget_idx)
+plt.figure()
 plt.xlabel("t")
 plt.ylabel("Regret")
-# opt=env.opt()
-# opt_reward=env.opt()
-ooo = []
-for i in range(n_experiments):
-    ooo.append(np.mean([b - a for a, b in zip(opt[i], gpts_rewards_per_experiment[i])]))
-
-plt.plot(np.cumsum(ooo, axis=0), 'g')
+plt.plot(np.cumsum(opt - np.mean(gpts_rewards_per_experiment, axis=0)), 'g')
 plt.show()
 
 
