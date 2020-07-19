@@ -23,7 +23,7 @@ import social_network.sn as sn
 n_nodes = 100
 budget = 10
 T = 1000
-n_episodes = 10
+n_episodes = 20
 bool_track = False
 
 edges_info, nodes_info, color_map = sn.create_sn(n_nodes)
@@ -82,7 +82,7 @@ for e in range(0, n_episodes):  # N_episodes
         best_super_arms_experiment)  # append a list with the IDs of best nodes in this experiment
     list_best_rewards_per_experiment.append([list_average_reward[i] for i in best_super_arms_experiment])
 
-opt = np.mean(np.array([np.mean(np.array(i)) for i in list_best_rewards_per_experiment]), axis=0)
+opt = np.mean(np.array([np.max(np.array(i)) for i in list_best_rewards_per_experiment]), axis=0)
 mean = np.mean(lin_social_ucb_rewards_per_experiment, axis=0)
 #print("opt {} mean {} bool {}".format(opt, mean, env.bool_track))
 
@@ -93,16 +93,16 @@ print(opt2)
 print(rewards)
 
 plt.figure(0)
-plt.title("nodes: {}, time: {}, n_episodes: {}, bool_track: {}".format(n_nodes, T, n_episodes, env.bool_track))
+plt.title("nodes: {}, times performed: {}, n_episodes: {}, ".format(n_nodes, n_episodes, T))
 plt.ylabel("Regret")
 plt.xlabel("t")
 plt.plot(np.cumsum(opt - mean), 'r')
 plt.legend(["LinUCB"])
 
-plt.figure(1)
-plt.title("DO NOT TAKE INTO ACOUNT nodes: {}, time: {}, n_episodes: {}, bool_track: {}".format(n_nodes, T, n_episodes, env.bool_track))
-plt.ylabel("Regret")
-plt.xlabel("Episodes")
-plt.plot(np.cumsum(opt2 - rewards), 'g')
-plt.legend(["LinUCB"])
+#plt.figure(1)
+#plt.title("DO NOT TAKE INTO ACOUNT nodes: {}, time: {}, n_episodes: {}, bool_track: {}".format(n_nodes, T, n_episodes, env.bool_track))
+#plt.ylabel("Regret")
+#plt.xlabel("Episodes")
+#plt.plot(np.cumsum(opt2 - rewards), 'g')
+#plt.legend(["LinUCB"])
 plt.show()

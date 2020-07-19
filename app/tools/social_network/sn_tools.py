@@ -81,14 +81,16 @@ def credits_assignment(dataset, dataset_edges, list_nodes, track = False, budget
         # Upgrade credits of initial nodes.
         if track == True :
             for id in idx_initial:
-                score_by_seeds_history[id][i] = list_credit_steps[id]
-                list_credit[id] += list_credit_steps[id]
+                score_by_seeds_history[id][i] = nbr_activates/budget
+                list_credit[id] = nbr_activates/budget
+                #score_by_seeds_history[id][i] = list_credit_steps[id]
+                #list_credit[id] += list_credit_steps[id]
 
         # If track = False, we assign to initial nodes, the sum of activated nodes.
         elif track == False :
             for id in idx_initial:
-                score_by_seeds_history[id][i] = nbr_activates/budget
-                list_credit[id] = nbr_activates/budget
+                score_by_seeds_history[id][i] = nbr_activates
+                list_credit[id] = nbr_activates
     #print(score_by_seeds_history)
 
     return list_credit, score_by_seeds_history, nbr_activates

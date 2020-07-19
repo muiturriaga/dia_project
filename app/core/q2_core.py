@@ -59,7 +59,7 @@ for e in range(0, n_episodes):
 credits_of_each_node, score_by_seeds_history, nbr_activates = sn_tools.credits_assignment(dataset=dataset,
                                                                                           dataset_edges=dataset_activation_edges,
                                                                                           list_nodes=nodes_info[1],
-                                                                                          track=False,
+                                                                                          track=True,
                                                                                           budget = budget)
 
 
@@ -93,7 +93,7 @@ print(np.nansum(score_by_seeds_history, axis=0))
 
 # We compute the rewards for many experiences, then we sorted it. However, in fact this algorithm, does not learn. It
 # just calculates many possibilities and return the best.
-list_reward_per_experiments_ordered = np.nansum(score_by_seeds_history, axis=0)
+list_reward_per_experiments_ordered = np.sort(np.nansum(score_by_seeds_history, axis=0))[::-1]
 list_reward_per_experiments = np.nansum(score_by_seeds_history, axis=0)
 #opt = np.round(np.array(best_cumulative_reward), 1)
 
@@ -118,7 +118,7 @@ for p in percents:
     credits_of_each_node, score_by_seeds_history, nbr_activates = sn_tools.credits_assignment(dataset=dataset,
                                                                                               dataset_edges=dataset_activation_edges,
                                                                                               list_nodes=nodes_info[1],
-                                                                                              track=False,
+                                                                                              track=True,
                                                                                               budget = budget)
 
     migliore = np.nansum(score_by_seeds_history, axis=0)
@@ -131,18 +131,21 @@ for p in percents:
 
 plt.figure(1)
 plt.axhline(y=opt, color="b")
+
+plt.title('Result of experiments')
 plt.plot(opt - list_reward_per_experiments_ordered, color="g")
 #   plt.title('Episodes {}, Nodes {}, Budget {}'.format(episodes, nodes, budget))
 plt.xlabel('Episodes')
 plt.ylabel('Difference of rewards')
 
 plt.figure(2)
+plt.title('Regret')
 plt.plot(np.cumsum(opt - list_reward_per_experiments), color="g")
 plt.xlabel('Episodes')
 plt.ylabel('Regret')
 
 plt.figure(3)
-plt.title('Error')
+plt.title('Best result changing the #episodes')
 plt.plot(epis, opts, color="g")
 plt.xlabel('Number of Episodes')
 plt.ylabel('Best result obtained')
