@@ -80,8 +80,6 @@ for e in range(0, n_experiments):
         list_of_edges = prob.make_bipartite()
         env.list_of_all_arms = list_of_edges
 
-        results.weight_of_matched_list()
-
 
     print(env.mu_bar, "\n", e)
 

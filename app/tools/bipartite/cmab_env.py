@@ -32,5 +32,5 @@ class CMAB_Environment:
     def opt(self):
         opt_value = 0
         for arms in self.matching_result.matched_list:
-            opt_value = opt_value + self.mu_bar[arms.i]
+            opt_value = opt_value + arms.constant
         return opt_value
